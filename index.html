@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECURITY SYSTEM - Jurassic Park 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @font-face {
+      font-family: 'Monospace';
+      src: local('Courier New'), local('Lucida Console'), local('Monaco');
+    }
+
+    body {
+      overflow: hidden;
+      background: #050607;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      cursor: default;
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* CRT scanline effect overlay */
+    #scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      z-index: 100;
+    }
+
+    /* UI Overlay */
+    #ui-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* Breadcrumb path */
+    #breadcrumb {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #00e0d6;
+      font-size: 14px;
+      text-shadow: 0 0 10px rgba(0, 224, 214, 0.5);
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+
+    #breadcrumb .path-separator {
+      color: #4fffe9;
+      margin: 0 8px;
+    }
+
+    /* Camera debug helper */
+    #camera-debug {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #00e0d6;
+      font-size: 11px;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      text-align: right;
+      line-height: 1.6;
+      opacity: 0.7;
+      text-shadow: 0 0 5px rgba(0, 224, 214, 0.3);
+    }
+
+    #camera-debug .label {
+      color: #4fffe9;
+      opacity: 0.6;
+    }
+
+    #camera-debug .value {
+      color: #7fd0e6;
+    }
+
+    #camera-debug .mode-folder {
+      color: #b45a55;
+    }
+
+    #camera-debug .mode-node {
+      color: #00e0d6;
+    }
+
+    /* Status line */
+    #status-line {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #7fd0e6;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.8;
+      transition: color 0.3s ease;
+    }
+
+    #status-line.warning {
+      color: #ff4a4a;
+      animation: blink 0.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Win overlay */
+    #win-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(5, 6, 7, 0.9);
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #win-overlay.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    #win-content {
+      text-align: center;
+      color: #00e0d6;
+    }
+
+    #win-content h1 {
+      font-size: 48px;
+      font-weight: normal;
+      letter-spacing: 8px;
+      text-shadow: 0 0 30px rgba(0, 224, 214, 0.8), 0 0 60px rgba(0, 224, 214, 0.4);
+      margin-bottom: 20px;
+      animation: winPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes winPulse {
+      0%, 100% { text-shadow: 0 0 30px rgba(0, 224, 214, 0.8), 0 0 60px rgba(0, 224, 214, 0.4); }
+      50% { text-shadow: 0 0 50px rgba(0, 224, 214, 1), 0 0 100px rgba(0, 224, 214, 0.6); }
+    }
+
+    #win-content p {
+      font-size: 14px;
+      color: #7fd0e6;
+      letter-spacing: 3px;
+      opacity: 0.7;
+    }
+
+    /* Lore panel */
+    #lore-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(5, 6, 7, 0.95);
+      border: 1px solid #00e0d6;
+      padding: 30px;
+      max-width: 400px;
+      display: none;
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #lore-panel.visible {
+      display: block;
+      opacity: 1;
+    }
+
+    #lore-panel h3 {
+      color: #4fffe9;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    #lore-panel p {
+      color: #7fd0e6;
+      font-size: 12px;
+      line-height: 1.6;
+      letter-spacing: 1px;
+    }
+
+    #lore-panel .close-hint {
+      margin-top: 20px;
+      color: #00e0d6;
+      font-size: 10px;
+      opacity: 0.6;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    /* Loading screen */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #050607;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 300;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #loading .loader {
+      color: #00e0d6;
+      font-size: 16px;
+      letter-spacing: 4px;
+      animation: loadPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loadPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading"><div class="loader">INITIALIZING SYSTEM...</div></div>
+
+  <div id="canvas-container"></div>
+  <div id="scanlines"></div>
+
+  <div id="ui-overlay">
+    <div id="breadcrumb">/usr</div>
+    <div id="camera-debug">
+      <div><span class="label">MODE:</span> <span id="debug-mode" class="value">FOLDER</span></div>
+      <div><span class="label">DISTANCE:</span> <span id="debug-distance" class="value">--</span></div>
+      <div><span class="label">RANGE:</span> <span id="debug-range" class="value">--</span></div>
+      <div><span class="label">TARGET:</span> <span id="debug-target" class="value">--</span></div>
+    </div>
+    <div id="status-line">SELECT NODE</div>
+  </div>
+
+  <div id="win-overlay">
+    <div id="win-content">
+      <h1>SECURITY SYSTEM: ONLINE</h1>
+      <p>ACCESS GRANTED // PARK CONTROL RESTORED</p>
+    </div>
+  </div>
+
+  <div id="lore-panel">
+    <h3>DATA FILE</h3>
+    <p id="lore-text"></p>
+    <div class="close-hint">PRESS ANY KEY TO CLOSE</div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+{
+  "root_usr": {
+    "id": "root_usr",
+    "name": "/usr",
+    "depth": 0,
+    "nodes": [
+      { "id": "sys_bin", "label": "bin", "type": "folderGate", "enterable": true, "nextFolderId": "sys_core", "icon": "chip" },
+      { "id": "local_etc", "label": "etc", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "share_doc", "label": "doc", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Park documentation from 1993. Contains initial feasibility studies for de-extinction technology." },
+      { "id": "include_h", "label": "include", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "sbin_init", "label": "init", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "lib_core", "label": "lib", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "tmp_cache", "label": "cache", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
+      { "id": "var_log", "label": "log", "type": "lore", "enterable": false, "icon": "paper", "loreText": "System logs. Notable entry: 'I told them this was a bad idea.' - D. Nedry" },
+      { "id": "src_code", "label": "src", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "games", "label": "games", "type": "dead", "enterable": false, "icon": "paper" }
+    ]
+  },
+  "sys_core": {
+    "id": "sys_core",
+    "name": "sys",
+    "depth": 1,
+    "nodes": [
+      { "id": "kernel", "label": "kernel", "type": "folderGate", "enterable": true, "nextFolderId": "park_ops", "icon": "lock" },
+      { "id": "config_cf", "label": "config", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "modules", "label": "modules", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "dev_null", "label": "null", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "proc_stat", "label": "stat", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Process statistics show unusual CPU usage from the security systems." },
+      { "id": "mem_info", "label": "memory", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "fs_root", "label": "fs", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "net_route", "label": "routes", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" },
+      { "id": "syslog", "label": "syslog", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Warning: Unscheduled door overrides detected at multiple enclosures." },
+      { "id": "boot_grub", "label": "boot", "type": "dead", "enterable": false, "icon": "paper" }
+    ]
+  },
+  "park_ops": {
+    "id": "park_ops",
+    "name": "park",
+    "depth": 2,
+    "nodes": [
+      { "id": "operations", "label": "ops", "type": "folderGate", "enterable": true, "nextFolderId": "control_net", "icon": "lock" },
+      { "id": "dinosaurs", "label": "dinos", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "visitors", "label": "visitors", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "staff", "label": "staff", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Staff directory reveals reduced security personnel overnight." },
+      { "id": "maintenance", "label": "maint", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "security_z", "label": "security", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "giftshop", "label": "gifts", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "transport", "label": "transport", "type": "trap", "enterable": false, "trapEffect": "lockout", "icon": "warning" },
+      { "id": "catering", "label": "food", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "medical", "label": "medical", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Medical supplies inventory shows unexpected usage patterns." },
+      { "id": "utilities", "label": "utils", "type": "dead", "enterable": false, "icon": "paper" }
+    ]
+  },
+  "control_net": {
+    "id": "control_net",
+    "name": "control",
+    "depth": 3,
+    "nodes": [
+      { "id": "fence_pwr", "label": "fence", "type": "folderGate", "enterable": true, "nextFolderId": "security_mgr", "icon": "lock" },
+      { "id": "doors", "label": "doors", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "cameras", "label": "cameras", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Camera feeds show movement in T-Rex paddock. Animal is active." },
+      { "id": "sensors", "label": "sensors", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "alerts", "label": "alerts", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "comms", "label": "comms", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "lighting", "label": "lights", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "climate", "label": "climate", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
+      { "id": "audio", "label": "audio", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Park-wide announcement system tested. 'Your scientists were so preoccupied with whether or not they could...'" },
+      { "id": "fire suppression", "label": "fire", "type": "dead", "enterable": false, "icon": "chip" }
+    ]
+  },
+  "security_mgr": {
+    "id": "security_mgr",
+    "name": "security",
+    "depth": 4,
+    "nodes": [
+      { "id": "auth_user", "label": "auth", "type": "folderGate", "enterable": true, "nextFolderId": "override_reauth", "icon": "lock" },
+      { "id": "ids_main", "label": "ids", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "audit_logs", "label": "audit", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Security audit reveals unauthorized access from terminal 11-C. Account: Nedry." },
+      { "id": "firewall", "label": "firewall", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "vpn_gate", "label": "vpn", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "keys", "label": "keys", "type": "dead", "enterable": false, "icon": "lock" },
+      { "id": "tokens", "label": "tokens", "type": "dead", "enterable": false, "icon": "lock" },
+      { "id": "backup_sec", "label": "backup", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" },
+      { "id": "ACL", "label": "acl", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Access Control List modification detected. Permissions elevated for contractor account." },
+      { "id": "cert_pki", "label": "certs", "type": "dead", "enterable": false, "icon": "lock" }
+    ]
+  },
+  "override_reauth": {
+    "id": "override_reauth",
+    "name": "override",
+    "depth": 5,
+    "nodes": [
+      { "id": "master_control", "label": "MASTER", "type": "folderGate", "enterable": true, "nextFolderId": null, "icon": "lock", "hintLevel": 3 },
+      { "id": "emergency_off", "label": "EMERGENCY", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "bypass_main", "label": "BYPASS", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "grid_link", "label": "GRID", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Power grid interface. Multiple isolation switches in OFF position." },
+      { "id": "gen_backup", "label": "GENERATOR", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "ups_power", "label": "UPS", "type": "dead", "enterable": false, "icon": "chip" },
+      { "id": "thermal_ctl", "label": "THERMAL", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Cooling system status critical. Main coolant pumps offline." },
+      { "id": "aux_power", "label": "AUX", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
+      { "id": "manual_sw", "label": "MANUAL", "type": "dead", "enterable": false, "icon": "lock" },
+      { "id": "remote_s", "label": "REMOTE", "type": "dead", "enterable": false, "icon": "chip" }
+    ]
+  }
+}
