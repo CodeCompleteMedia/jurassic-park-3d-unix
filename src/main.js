@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import FOLDER_GRAPH from './folders.json' with { type: 'json' };
+import { CAMERA_CONFIG } from './camera-config.js';
 
 // ============================================
 // CONFIGURATION
@@ -68,8 +69,8 @@ const state = {
   currentDistance: 60,
   currentHeight: 18,
   isAnimating: false,
-  lastFolderDistance: 35, // Remember folder zoom level for returning
-  nodeZoomDistance: 8 // Distance when zoomed into a node
+  lastFolderDistance: CAMERA_CONFIG.folder.maxDistance, // Remember folder zoom level for returning
+  nodeZoomDistance: CAMERA_CONFIG.node.selectDistance // Distance when zoomed into a node
 };
 
 // ============================================
@@ -105,10 +106,10 @@ function init() {
   const platformZ = CONFIG.depth.startZ - (folder.depth * CONFIG.depth.step);
   state.currentLookAt.set(0, CONFIG.platform.height / 2, platformZ);
   state.targetLookAt.copy(state.currentLookAt);
-  state.currentDistance = 35;
-  state.targetDistance = 35;
-  state.currentHeight = 12;
-  state.targetHeight = 12;
+  state.currentDistance = CAMERA_CONFIG.folder.initialDistance;
+  state.targetDistance = CAMERA_CONFIG.folder.initialDistance;
+  state.currentHeight = CAMERA_CONFIG.folder.initialHeight;
+  state.targetHeight = CAMERA_CONFIG.folder.initialHeight;
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -649,7 +650,7 @@ function updateCameraLookAt() {
 // SMOOTH CAMERA SYSTEM
 // ============================================
 function updateCameraSmooth(delta) {
-  const smoothFactor = 1 - Math.exp(-delta * 4);
+  const smoothFactor = 1 - Math.exp(-delta * CAMERA_CONFIG.smoothFactor);
 
   // Smooth interpolation for all camera properties
   state.currentLookAt.lerp(state.targetLookAt, smoothFactor);
@@ -672,9 +673,9 @@ function setCameraToFolder(folderId, zoomIn = true) {
   // Target is the center of the folder platform
   state.targetLookAt.set(0, CONFIG.platform.height / 2, platformZ);
 
-  // Zoom in to see the whole folder (35 is the max zoom out)
-  const baseDistance = zoomIn ? 35 : 35;
-  const baseHeight = zoomIn ? 12 : 12;
+  // Zoom in to see the whole folder using config values
+  const baseDistance = zoomIn ? CAMERA_CONFIG.folder.maxDistance : CAMERA_CONFIG.folder.maxDistance;
+  const baseHeight = zoomIn ? CAMERA_CONFIG.folder.maxHeight : CAMERA_CONFIG.folder.maxHeight;
   state.targetDistance = baseDistance;
   state.targetHeight = baseHeight;
   state.cameraMode = 'folder';
@@ -697,9 +698,9 @@ function updateCameraDebug() {
 
   // Update range display
   if (state.cameraMode === 'node') {
-    rangeEl.textContent = '8 - 45';
+    rangeEl.textContent = `${CAMERA_CONFIG.node.minDistance} - ${CAMERA_CONFIG.node.maxDistance}`;
   } else {
-    rangeEl.textContent = '25 - 35';
+    rangeEl.textContent = `${CAMERA_CONFIG.folder.minDistance} - ${CAMERA_CONFIG.folder.maxDistance}`;
   }
 
   // Update target display
@@ -709,11 +710,11 @@ function updateCameraDebug() {
 }
 
 function zoomCamera(delta) {
-  const zoomSpeed = 0.15;
+  const zoomSpeed = CAMERA_CONFIG.zoomSpeed;
 
   // When in node mode, allow zooming out past folder level to deselect
   if (state.cameraMode === 'node') {
-    const nodeDeselectThreshold = 38; // Zoom out past this = deselect
+    const nodeDeselectThreshold = CAMERA_CONFIG.deselectThreshold;
 
     state.targetDistance += delta * zoomSpeed * 10;
 
@@ -727,13 +728,13 @@ function zoomCamera(delta) {
     }
 
     // Clamp to node-level bounds
-    const minDistance = 8;
-    const maxDistance = 45;
+    const minDistance = CAMERA_CONFIG.node.minDistance;
+    const maxDistance = CAMERA_CONFIG.node.maxDistance;
     state.targetDistance = Math.max(minDistance, Math.min(maxDistance, state.targetDistance));
   } else {
     // Folder mode
-    const minDistance = 25;
-    const maxDistance = 35; // Max zoom out is standard folder view
+    const minDistance = CAMERA_CONFIG.folder.minDistance;
+    const maxDistance = CAMERA_CONFIG.folder.maxDistance;
 
     // Remember folder zoom level (but cap it to maxDistance)
     state.lastFolderDistance = Math.min(state.targetDistance, maxDistance);
