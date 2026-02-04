@@ -373,30 +373,36 @@ function createFloorLabel(folder, xPos, zPos, platformDepth) {
 
   const displayName = folder.name.replace(/^\//, '').toUpperCase();
 
-  ctx.font = 'bold 48px "Courier New", monospace';
+  ctx.font = 'bold 72px "Courier New", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#c96b63';
   ctx.shadowColor = '#c96b63';
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = 12;
   ctx.fillText(displayName, canvas.width / 2, canvas.height / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
 
-  const spriteMaterial = new THREE.SpriteMaterial({
+  const planeGeometry = new THREE.PlaneGeometry(14, 3.5);
+  const planeMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
-    opacity: 0.9,
+    opacity: 0.85,
+    side: THREE.DoubleSide,
     depthWrite: false
   });
 
-  const sprite = new THREE.Sprite(spriteMaterial);
-  sprite.scale.set(10, 2.5, 1);
-  sprite.position.set(xPos, 0.3, zPos + platformDepth / 2 + 1.5);
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.position.set(xPos, 0.05, zPos + platformDepth / 2 + 1.5);
 
-  scene.add(sprite);
-  folderLabels.set(folder.id, sprite);
+  // Lay flat on the floor
+  plane.rotation.x = -Math.PI / 2;
+
+  scene.add(plane);
+  folderLabels.set(folder.id, plane);
 }
 
 function createNodes(folder) {
