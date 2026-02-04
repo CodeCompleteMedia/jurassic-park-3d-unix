@@ -568,7 +568,7 @@ function updateBreadcrumb() {
     // Create folder element
     const folderSpan = document.createElement('span');
     folderSpan.className = 'folder-item' + (isCurrent ? ' current' : '');
-    folderSpan.textContent = '/' + folder.name;
+    folderSpan.textContent = folder.name.replace(/^\//, '');
     folderSpan.dataset.folderId = folderId;
 
     // Add click handler for non-current items
