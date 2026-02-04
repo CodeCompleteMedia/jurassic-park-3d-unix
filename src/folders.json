@@ -13,7 +13,15 @@
       { "id": "tmp_cache", "label": "cache", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
       { "id": "var_log", "label": "log", "type": "lore", "enterable": false, "icon": "paper", "loreText": "System logs. Notable entry: 'I told them this was a bad idea.' - D. Nedry" },
       { "id": "src_code", "label": "src", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "games", "label": "games", "type": "dead", "enterable": false, "icon": "paper" }
+      { "id": "games", "label": "games", "type": "dead", "enterable": false, "icon": "paper" },
+
+      { "id": "usr_ingn", "label": "ingen", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "InGen internal memos. Includes procurement records for fencing, tranq supplies, and embryo transport." },
+      { "id": "usr_biofx", "label": "biofx", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "Bio-systems utilities. References Dr. Henry Wu lab workflows and batch incubation schedules." },
+      { "id": "usr_lysine", "label": "lysine", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "/usr" },
+      { "id": "usr_supply", "label": "supply", "type": "dead", "enterable": false, "icon": "paper", "parentName": "/usr" },
+      { "id": "usr_crashdump", "label": "crashdump", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "/usr" },
+      { "id": "usr_mr_arnold", "label": "arnold_notes", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "Ray Arnold terminal notes. Mentions recurring door override loops and delayed fence re-energize events." },
+      { "id": "usr_isla", "label": "isla_nublar", "type": "dead", "enterable": false, "icon": "paper", "parentName": "/usr" }
     ]
   },
   "sys_core": {
@@ -30,7 +38,15 @@
       { "id": "fs_root", "label": "fs", "type": "dead", "enterable": false, "icon": "paper" },
       { "id": "net_route", "label": "routes", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" },
       { "id": "syslog", "label": "syslog", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Warning: Unscheduled door overrides detected at multiple enclosures." },
-      { "id": "boot_grub", "label": "boot", "type": "dead", "enterable": false, "icon": "paper" }
+      { "id": "boot_grub", "label": "boot", "type": "dead", "enterable": false, "icon": "paper" },
+
+      { "id": "sys_watchdog", "label": "watchdog", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "System watchdog notes repeated restarts after power dips. Mentions a short window where fences report 'nominal' before collapsing." },
+      { "id": "sys_crypt", "label": "crypt", "type": "dead", "enterable": false, "icon": "lock", "parentName": "sys" },
+      { "id": "sys_rbac", "label": "rbac", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "Role mappings include 'contractor', 'warden', and 'tour_ops'. A single contractor role has unexpected elevated scope." },
+      { "id": "sys_patchlvl", "label": "patchlevel", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "sys" },
+      { "id": "sys_dma", "label": "dma", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning", "parentName": "sys" },
+      { "id": "sys_failover", "label": "failover", "type": "dead", "enterable": false, "icon": "chip", "parentName": "sys" },
+      { "id": "sys_uaudit", "label": "uaudit", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "Micro-audit trail shows a late change request tagged 'Costa Rica incident follow-up' with incomplete sign-off." }
     ]
   },
   "park_ops": {
@@ -48,7 +64,16 @@
       { "id": "transport", "label": "transport", "type": "trap", "enterable": false, "trapEffect": "lockout", "icon": "warning" },
       { "id": "catering", "label": "food", "type": "dead", "enterable": false, "icon": "paper" },
       { "id": "medical", "label": "medical", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Medical supplies inventory shows unexpected usage patterns." },
-      { "id": "utilities", "label": "utils", "type": "dead", "enterable": false, "icon": "paper" }
+      { "id": "utilities", "label": "utils", "type": "dead", "enterable": false, "icon": "paper" },
+
+      { "id": "park_enclosures", "label": "enclosures", "type": "lore", "enterable": false, "icon": "paper", "parentName": "park", "loreText": "Enclosure registry includes raptor pen repair notes and a warning about 'intelligent testing at the perimeter'." },
+      { "id": "park_muldn", "label": "muldoon", "type": "lore", "enterable": false, "icon": "paper", "parentName": "park", "loreText": "Game warden field notes. Mentions tranquilizer variance and a preference for 'the big one' protocol." },
+      { "id": "park_tour", "label": "tour_route", "type": "dead", "enterable": false, "icon": "paper", "parentName": "park" },
+      { "id": "park_embryos", "label": "embryo_stock", "type": "lore", "enterable": false, "icon": "paper", "parentName": "park", "loreText": "Embryo inventory list with temperature deviation flags. Several vials marked 'priority export'." },
+      { "id": "park_compsogn", "label": "compys", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "park" },
+      { "id": "park_incident", "label": "incident_1992", "type": "lore", "enterable": false, "icon": "paper", "parentName": "park", "loreText": "Pre-opening incident summary references a worker injury and hurried containment changes, filed under restricted access." },
+      { "id": "park_pr", "label": "press", "type": "dead", "enterable": false, "icon": "paper", "parentName": "park" },
+      { "id": "park_lysine_ctl", "label": "lysine_ctl", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "park" }
     ]
   },
   "control_net": {
@@ -65,7 +90,17 @@
       { "id": "lighting", "label": "lights", "type": "dead", "enterable": false, "icon": "chip" },
       { "id": "climate", "label": "climate", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
       { "id": "audio", "label": "audio", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Park-wide announcement system tested. 'Your scientists were so preoccupied with whether or not they could...'" },
-      { "id": "fire suppression", "label": "fire", "type": "dead", "enterable": false, "icon": "chip" }
+      { "id": "fire suppression", "label": "fire", "type": "dead", "enterable": false, "icon": "chip" },
+
+      { "id": "ctl_rfids", "label": "rfid", "type": "lore", "enterable": false, "icon": "paper", "parentName": "control", "loreText": "RFID animal tracking table shows signal drift near the raptor paddock, likely due to damaged perimeter hardware." },
+      { "id": "ctl_motion", "label": "motion", "type": "dead", "enterable": false, "icon": "chip", "parentName": "control" },
+      { "id": "ctl_sonar", "label": "sonar", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "control" },
+      { "id": "ctl_toursys", "label": "tour_sys", "type": "lore", "enterable": false, "icon": "paper", "parentName": "control", "loreText": "Automated tour vehicle controller logs a forced stop near the T-Rex gate with manual release codes appended." },
+      { "id": "ctl_paddock", "label": "paddock_io", "type": "dead", "enterable": false, "icon": "chip", "parentName": "control" },
+      { "id": "ctl_overridebus", "label": "override_bus", "type": "trap", "enterable": false, "trapEffect": "lockout", "icon": "warning", "parentName": "control" },
+      { "id": "ctl_sattlink", "label": "satlink", "type": "lore", "enterable": false, "icon": "paper", "parentName": "control", "loreText": "Satellite uplink queue shows aborted outbound burst labeled 'dock rendezvous'. Payload size matches embryo inventory exports." },
+      { "id": "ctl_powercap", "label": "power_cap", "type": "dead", "enterable": false, "icon": "chip", "parentName": "control" },
+      { "id": "ctl_genny", "label": "gen_status", "type": "lore", "enterable": false, "icon": "paper", "parentName": "control", "loreText": "Backup generator report shows delayed warm-up and unstable voltage, consistent with partial load shedding." }
     ]
   },
   "security_mgr": {
@@ -82,7 +117,16 @@
       { "id": "tokens", "label": "tokens", "type": "dead", "enterable": false, "icon": "lock" },
       { "id": "backup_sec", "label": "backup", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" },
       { "id": "ACL", "label": "acl", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Access Control List modification detected. Permissions elevated for contractor account." },
-      { "id": "cert_pki", "label": "certs", "type": "dead", "enterable": false, "icon": "lock" }
+      { "id": "cert_pki", "label": "certs", "type": "dead", "enterable": false, "icon": "lock" },
+
+      { "id": "sec_badges", "label": "badges", "type": "lore", "enterable": false, "icon": "paper", "parentName": "security", "loreText": "Badge access map shows visitor clearances unexpectedly inheriting staff corridor privileges after a late config push." },
+      { "id": "sec_lockdown", "label": "lockdown", "type": "dead", "enterable": false, "icon": "lock", "parentName": "security" },
+      { "id": "sec_hammond", "label": "hammond_ok", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "security" },
+      { "id": "sec_terminal11c", "label": "terminal_11c", "type": "lore", "enterable": false, "icon": "paper", "parentName": "security", "loreText": "Terminal 11-C session snapshots show timed keystroke bursts, consistent with scripted privilege escalation." },
+      { "id": "sec_embargolist", "label": "embargo", "type": "dead", "enterable": false, "icon": "paper", "parentName": "security" },
+      { "id": "sec_tripwire", "label": "tripwire", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning", "parentName": "security" },
+      { "id": "sec_visitor_ids", "label": "visitor_ids", "type": "dead", "enterable": false, "icon": "chip", "parentName": "security" },
+      { "id": "sec_rpctrace", "label": "rpc_trace", "type": "lore", "enterable": false, "icon": "paper", "parentName": "security", "loreText": "RPC trace indicates remote toggles issued from an internal workstation, then relayed to perimeter subsystems in sequence." }
     ]
   },
   "override_reauth": {
@@ -99,7 +143,16 @@
       { "id": "thermal_ctl", "label": "THERMAL", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Cooling system status critical. Main coolant pumps offline." },
       { "id": "aux_power", "label": "AUX", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
       { "id": "manual_sw", "label": "MANUAL", "type": "dead", "enterable": false, "icon": "lock" },
-      { "id": "remote_s", "label": "REMOTE", "type": "dead", "enterable": false, "icon": "chip" }
+      { "id": "remote_s", "label": "REMOTE", "type": "dead", "enterable": false, "icon": "chip" },
+
+      { "id": "ovr_fence_mode", "label": "FENCE_MODE", "type": "lore", "enterable": false, "icon": "paper", "parentName": "override", "loreText": "Fence controller profiles include 'TOUR', 'STORM', and 'LOCKDOWN'. A hidden profile appears briefly in logs, then vanishes." },
+      { "id": "ovr_door_matrix", "label": "DOOR_MATRIX", "type": "dead", "enterable": false, "icon": "chip", "parentName": "override" },
+      { "id": "ovr_lynchpin", "label": "LYNCHPIN", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "override" },
+      { "id": "ovr_wu_lab", "label": "WU_LAB", "type": "lore", "enterable": false, "icon": "paper", "parentName": "override", "loreText": "Lab safety override references containment airlocks and cold storage alarms. Several alarms are set to 'ignore' during tours." },
+      { "id": "ovr_ingen_key", "label": "INGEN_KEY", "type": "dead", "enterable": false, "icon": "lock", "parentName": "override" },
+      { "id": "ovr_nedry_pkg", "label": "NEDRY_PKG", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "override" },
+      { "id": "ovr_spare_codes", "label": "SPARE_CODES", "type": "lore", "enterable": false, "icon": "paper", "parentName": "override", "loreText": "Spare code list includes a note: 'Do not store plaintext'. The file itself is plaintext." },
+      { "id": "ovr_island_link", "label": "ISLAND_LINK", "type": "dead", "enterable": false, "icon": "chip", "parentName": "override" }
     ]
   }
 }

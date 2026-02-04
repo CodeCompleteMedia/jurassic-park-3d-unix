@@ -60,6 +60,9 @@ const state = {
   isTransitioning: false,
   isWon: false,
 
+  // Navigation history: array of folder IDs from root to current
+  navigationHistory: ['root_usr'],
+
   // Camera state
   cameraMode: 'folder', // 'folder' | 'node'
   targetLookAt: new THREE.Vector3(0, 0, 0), // What the camera is looking at
@@ -515,17 +518,47 @@ function showCurrentFolder() {
 }
 
 function updateBreadcrumb() {
-  const path = [];
-  let currentId = state.currentFolderId;
+  const breadcrumbEl = document.getElementById('breadcrumb');
+  breadcrumbEl.innerHTML = '';
 
-  while (currentId) {
-    path.unshift(FOLDER_GRAPH[currentId].name);
-    const folder = FOLDER_GRAPH[currentId];
-    const gateNode = folder.nodes.find(n => n.type === 'folderGate');
-    currentId = gateNode ? gateNode.nextFolderId : null;
-  }
+  state.navigationHistory.forEach((folderId, index) => {
+    const folder = FOLDER_GRAPH[folderId];
+    const isCurrent = index === state.navigationHistory.length - 1;
 
-  document.getElementById('breadcrumb').textContent = path.join(' / ');
+    // Create folder element
+    const folderSpan = document.createElement('span');
+    folderSpan.className = 'folder-item' + (isCurrent ? ' current' : '');
+    folderSpan.textContent = '/' + folder.name;
+    folderSpan.dataset.folderId = folderId;
+
+    // Add click handler for non-current items
+    if (!isCurrent) {
+      folderSpan.addEventListener('click', () => navigateToHistoryIndex(index));
+    }
+
+    breadcrumbEl.appendChild(folderSpan);
+
+    // Add separator if not last
+    if (index < state.navigationHistory.length - 1) {
+      const separator = document.createElement('span');
+      separator.className = 'path-separator';
+      separator.textContent = '/';
+      breadcrumbEl.appendChild(separator);
+    }
+  });
+}
+
+function navigateToHistoryIndex(targetIndex) {
+  if (state.isTransitioning || state.isWon) return;
+
+  const targetFolderId = state.navigationHistory[targetIndex];
+  if (!targetFolderId || targetFolderId === state.currentFolderId) return;
+
+  // Slice history to target index + 1
+  state.navigationHistory = state.navigationHistory.slice(0, targetIndex + 1);
+
+  // Navigate to the folder (don't add to history since we're navigating within it)
+  enterFolder(targetFolderId, false);
 }
 
 // ============================================
@@ -870,9 +903,14 @@ function handleNodeDoubleClick(nodeId) {
   }
 }
 
-function enterFolder(folderId) {
+function enterFolder(folderId, addToHistory = true) {
   state.isTransitioning = true;
   document.getElementById('status-line').textContent = 'ACCESSING...';
+
+  // Add to navigation history if this is forward navigation
+  if (addToHistory && !state.navigationHistory.includes(folderId)) {
+    state.navigationHistory.push(folderId);
+  }
 
   // Set camera target to new folder - will animate smoothly via updateCameraSmooth
   setCameraToFolder(folderId, true);

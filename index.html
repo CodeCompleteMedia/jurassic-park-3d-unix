@@ -74,11 +74,40 @@
       text-shadow: 0 0 10px rgba(0, 224, 214, 0.5);
       letter-spacing: 1px;
       opacity: 0.9;
+      pointer-events: auto;
     }
 
     #breadcrumb .path-separator {
       color: #4fffe9;
       margin: 0 8px;
+      pointer-events: none;
+    }
+
+    #breadcrumb .folder-item {
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+
+    #breadcrumb .folder-item:hover {
+      background: rgba(0, 224, 214, 0.15);
+      text-shadow: 0 0 15px rgba(0, 224, 214, 0.8);
+    }
+
+    #breadcrumb .folder-item.current {
+      color: #c96b63;
+      text-shadow: 0 0 15px rgba(201, 107, 99, 0.6);
+      cursor: default;
+    }
+
+    #breadcrumb .folder-item.current:hover {
+      background: transparent;
+    }
+
+    #breadcrumb .folder-item.active {
+      color: #4fffe9;
+      text-shadow: 0 0 20px rgba(79, 255, 233, 1);
     }
 
     /* Camera debug helper */
