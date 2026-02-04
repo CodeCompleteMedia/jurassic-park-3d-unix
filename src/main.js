@@ -39,7 +39,7 @@ const CONFIG = {
     fov: 78,
     near: 0.1,
     far: 800,
-    defaultPos: new THREE.Vector3(0, 10.5, 26),
+    defaultPos: new THREE.Vector3(0, 18, 50),
     lookAt: new THREE.Vector3(0, 6.5, 0)
   },
   animation: {
@@ -66,11 +66,11 @@ const state = {
   // Camera state
   cameraMode: 'folder', // 'folder' | 'node'
   targetLookAt: new THREE.Vector3(0, 0, 0), // What the camera is looking at
-  targetDistance: 35, // Distance from lookAt target
-  targetHeight: 12, // Height above lookAt target
+  targetDistance: CAMERA_CONFIG.folder.maxDistance, // Distance from lookAt target
+  targetHeight: CAMERA_CONFIG.folder.maxHeight, // Height above lookAt target
   currentLookAt: new THREE.Vector3(0, 0, 0),
-  currentDistance: 60,
-  currentHeight: 18,
+  currentDistance: CAMERA_CONFIG.folder.maxDistance,
+  currentHeight: CAMERA_CONFIG.folder.maxHeight,
   isAnimating: false,
   lastFolderDistance: CAMERA_CONFIG.folder.maxDistance, // Remember folder zoom level for returning
   nodeZoomDistance: CAMERA_CONFIG.node.selectDistance // Distance when zoomed into a node
@@ -518,26 +518,30 @@ function showCurrentFolder() {
   // Set camera to look at this folder
   setCameraToFolder(state.currentFolderId, false);
 
-  // Show/hide platforms: current depth + next depth + previous depth
-  // This allows users to see branching paths at current level
+  // Show/hide platforms: previous row + current + next 2 rows
+  // This allows users to see at least 3 rows ahead
   platformMeshes.forEach((mesh, folderId) => {
     const f = FOLDER_GRAPH[folderId];
-    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 1;
+    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
   });
 
-  // Show/hide nodes for current depth only
+  // Show/hide nodes for current depth and next depth (no text on distant nodes)
   nodeMeshes.forEach(({ mesh, label }, nodeId) => {
     const nodeFolderId = mesh.userData.folderId;
     const nodeFolder = FOLDER_GRAPH[nodeFolderId];
-    const isVisible = nodeFolder.depth === depthIndex;
-    mesh.visible = isVisible;
+    const isCurrentDepth = nodeFolder.depth === depthIndex;
+    const isNextDepth = nodeFolder.depth === depthIndex + 1;
+
+    // Show nodes for current and next depth
+    mesh.visible = isCurrentDepth || isNextDepth;
 
     // Reset material opacity and transparency
     mesh.material.opacity = 1;
     mesh.material.transparent = false;
 
+    // Only show labels for current depth (hide distant text)
     if (label) {
-      label.visible = isVisible;
+      label.visible = isCurrentDepth;
       label.material.opacity = 1;
     }
   });
