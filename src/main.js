@@ -278,6 +278,38 @@ function buildAllPlatforms() {
   });
 }
 
+// Calculate folder positions for visual branching layout
+function calculateFolderPositions() {
+  const positions = {};
+  const depthFolders = {};
+
+  // Group folders by depth
+  Object.values(FOLDER_GRAPH).forEach(folder => {
+    if (!depthFolders[folder.depth]) {
+      depthFolders[folder.depth] = [];
+    }
+    depthFolders[folder.depth].push(folder);
+  });
+
+  // Calculate X positions for each folder at each depth
+  Object.keys(depthFolders).forEach(depth => {
+    const folders = depthFolders[depth];
+    const count = folders.length;
+    const spacing = 35;
+
+    folders.forEach((folder, index) => {
+      // Center the group around x=0
+      const totalWidth = (count - 1) * spacing;
+      const startX = -totalWidth / 2;
+      positions[folder.id] = startX + index * spacing;
+    });
+  });
+
+  return positions;
+}
+
+const FOLDER_POSITIONS = calculateFolderPositions();
+
 function createPlatform(folder) {
   const nodes = folder.nodes;
   const numNodes = nodes.length;
@@ -308,6 +340,9 @@ function createPlatform(folder) {
   const depthIndex = folder.depth;
   const zPos = CONFIG.depth.startZ - (depthIndex * CONFIG.depth.step);
 
+  // Get pre-calculated X position for this folder
+  const xPos = FOLDER_POSITIONS[folder.id] || 0;
+
   const geometry = new THREE.BoxGeometry(finalWidth, CONFIG.platform.height, finalDepth);
   const material = new THREE.MeshLambertMaterial({
     color: CONFIG.colors.folderBase,
@@ -316,8 +351,8 @@ function createPlatform(folder) {
   });
 
   const platform = new THREE.Mesh(geometry, material);
-  platform.position.set(0, 0, zPos);
-  platform.userData = { folderId: folder.id, width: finalWidth, depth: finalDepth, cols, rows, scale, padding, gap, zPos };
+  platform.position.set(xPos, 0, zPos);
+  platform.userData = { folderId: folder.id, width: finalWidth, depth: finalDepth, cols, rows, scale, padding, gap, zPos, branchOffset: xPos };
 
   scene.add(platform);
   platformMeshes.set(folder.id, platform);
@@ -326,7 +361,7 @@ function createPlatform(folder) {
 function createNodes(folder) {
   const depthIndex = folder.depth;
   const platform = platformMeshes.get(folder.id);
-  const { cols, rows, scale, gap, zPos } = platform.userData;
+  const { cols, rows, scale, gap, zPos, branchOffset } = platform.userData;
 
   // Calculate platform top Y
   const platformTopY = CONFIG.platform.height / 2 + CONFIG.node.size.h / 2 + 0.1;
@@ -352,8 +387,8 @@ function createNodes(folder) {
     const col = index % cols;
     const row = Math.floor(index / cols);
 
-    // Calculate position (add platform Z position to place nodes correctly in world)
-    const x = startX + col * spacingX;
+    // Calculate position (add platform Z position and branch offset to place nodes correctly in world)
+    const x = branchOffset + startX + col * spacingX;
     const z = zPos + startZLocal + row * spacingZ;
     const y = platformTopY;
 
@@ -483,17 +518,18 @@ function showCurrentFolder() {
   // Set camera to look at this folder
   setCameraToFolder(state.currentFolderId, false);
 
-  // Show/hide platforms based on depth
+  // Show/hide platforms: current depth + next depth + previous depth
+  // This allows users to see branching paths at current level
   platformMeshes.forEach((mesh, folderId) => {
     const f = FOLDER_GRAPH[folderId];
-    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
+    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 1;
   });
 
-  // Show/hide nodes and reset their opacity/material
+  // Show/hide nodes for current depth only
   nodeMeshes.forEach(({ mesh, label }, nodeId) => {
     const nodeFolderId = mesh.userData.folderId;
     const nodeFolder = FOLDER_GRAPH[nodeFolderId];
-    const isVisible = nodeFolder.depth >= depthIndex - 1 && nodeFolder.depth <= depthIndex + 1;
+    const isVisible = nodeFolder.depth === depthIndex;
     mesh.visible = isVisible;
 
     // Reset material opacity and transparency
@@ -703,8 +739,11 @@ function setCameraToFolder(folderId, zoomIn = true) {
   const folder = FOLDER_GRAPH[folderId];
   const platformZ = CONFIG.depth.startZ - (folder.depth * CONFIG.depth.step);
 
+  // Get X position for this folder
+  const xPos = FOLDER_POSITIONS[folderId] || 0;
+
   // Target is the center of the folder platform
-  state.targetLookAt.set(0, CONFIG.platform.height / 2, platformZ);
+  state.targetLookAt.set(xPos, CONFIG.platform.height / 2, platformZ);
 
   // Zoom in to see the whole folder using config values
   const baseDistance = zoomIn ? CAMERA_CONFIG.folder.maxDistance : CAMERA_CONFIG.folder.maxDistance;
@@ -908,8 +947,15 @@ function enterFolder(folderId, addToHistory = true) {
   document.getElementById('status-line').textContent = 'ACCESSING...';
 
   // Add to navigation history if this is forward navigation
-  if (addToHistory && !state.navigationHistory.includes(folderId)) {
-    state.navigationHistory.push(folderId);
+  if (addToHistory) {
+    const existingIndex = state.navigationHistory.indexOf(folderId);
+    if (existingIndex !== -1) {
+      // Folder already in history - slice to that point (handling branch switching)
+      state.navigationHistory = state.navigationHistory.slice(0, existingIndex + 1);
+    } else {
+      // New folder - add to end
+      state.navigationHistory.push(folderId);
+    }
   }
 
   // Set camera target to new folder - will animate smoothly via updateCameraSmooth
