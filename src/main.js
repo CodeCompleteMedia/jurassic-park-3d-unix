@@ -69,7 +69,7 @@ const state = {
   currentHeight: 18,
   isAnimating: false,
   lastFolderDistance: 35, // Remember folder zoom level for returning
-  nodeZoomDistance: 20 // Distance when zoomed into a node
+  nodeZoomDistance: 8 // Distance when zoomed into a node
 };
 
 // ============================================
@@ -105,10 +105,10 @@ function init() {
   const platformZ = CONFIG.depth.startZ - (folder.depth * CONFIG.depth.step);
   state.currentLookAt.set(0, CONFIG.platform.height / 2, platformZ);
   state.targetLookAt.copy(state.currentLookAt);
-  state.currentDistance = 50;
-  state.targetDistance = 50;
-  state.currentHeight = 18;
-  state.targetHeight = 18;
+  state.currentDistance = 35;
+  state.targetDistance = 35;
+  state.currentHeight = 12;
+  state.targetHeight = 12;
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -672,9 +672,9 @@ function setCameraToFolder(folderId, zoomIn = true) {
   // Target is the center of the folder platform
   state.targetLookAt.set(0, CONFIG.platform.height / 2, platformZ);
 
-  // Zoom in to see the whole folder
-  const baseDistance = zoomIn ? 35 : 50;
-  const baseHeight = zoomIn ? 12 : 18;
+  // Zoom in to see the whole folder (35 is the max zoom out)
+  const baseDistance = zoomIn ? 35 : 35;
+  const baseHeight = zoomIn ? 12 : 12;
   state.targetDistance = baseDistance;
   state.targetHeight = baseHeight;
   state.cameraMode = 'folder';
@@ -699,7 +699,7 @@ function updateCameraDebug() {
   if (state.cameraMode === 'node') {
     rangeEl.textContent = '8 - 45';
   } else {
-    rangeEl.textContent = '25 - 60';
+    rangeEl.textContent = '25 - 35';
   }
 
   // Update target display
@@ -733,10 +733,10 @@ function zoomCamera(delta) {
   } else {
     // Folder mode
     const minDistance = 25;
-    const maxDistance = 60;
+    const maxDistance = 35; // Max zoom out is standard folder view
 
-    // Remember folder zoom level
-    state.lastFolderDistance = state.targetDistance;
+    // Remember folder zoom level (but cap it to maxDistance)
+    state.lastFolderDistance = Math.min(state.targetDistance, maxDistance);
 
     state.targetDistance += delta * zoomSpeed * 10;
     state.targetDistance = Math.max(minDistance, Math.min(maxDistance, state.targetDistance));
@@ -769,16 +769,12 @@ function handleNodeClick(nodeId) {
   state.selectedNodeId = nodeId;
   state.cameraMode = 'node';
 
-  // Center camera on this node and zoom in
+  // Center camera on this node and zoom in to node level
   const mesh = nodeData.mesh;
   state.targetLookAt.set(mesh.position.x, mesh.position.y, mesh.position.z);
 
-  // Zoom in to node level (keep current distance if switching between nodes)
-  if (state.currentDistance < state.nodeZoomDistance * 1.5) {
-    state.targetDistance = state.currentDistance; // Keep current zoom when switching nodes
-  } else {
-    state.targetDistance = state.nodeZoomDistance; // New selection, zoom in
-  }
+  // Always zoom to nodeZoomDistance (20) when selecting a node
+  state.targetDistance = state.nodeZoomDistance;
 
   // Update visual selection
   nodeMeshes.forEach(({ mesh, material }, id) => {
