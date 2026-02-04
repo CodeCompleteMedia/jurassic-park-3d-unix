@@ -82,6 +82,7 @@ const state = {
 let scene, camera, renderer, raycaster, mouse;
 let nodeMeshes = new Map();
 let platformMeshes = new Map();
+let folderLabels = new Map();
 let folderInstances = new Map();
 let connectionLines = null;
 let haloMesh = null;
@@ -356,6 +357,46 @@ function createPlatform(folder) {
 
   scene.add(platform);
   platformMeshes.set(folder.id, platform);
+
+  // Create floor label below platform
+  createFloorLabel(folder, xPos, zPos, finalDepth);
+}
+
+function createFloorLabel(folder, xPos, zPos, platformDepth) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 512;
+  canvas.height = 128;
+
+  ctx.fillStyle = 'transparent';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const displayName = folder.name.replace(/^\//, '').toUpperCase();
+
+  ctx.font = 'bold 48px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#c96b63';
+  ctx.shadowColor = '#c96b63';
+  ctx.shadowBlur = 8;
+  ctx.fillText(displayName, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  const spriteMaterial = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false
+  });
+
+  const sprite = new THREE.Sprite(spriteMaterial);
+  sprite.scale.set(10, 2.5, 1);
+  sprite.position.set(xPos, 0.3, zPos + platformDepth / 2 + 1.5);
+
+  scene.add(sprite);
+  folderLabels.set(folder.id, sprite);
 }
 
 function createNodes(folder) {
@@ -523,6 +564,12 @@ function showCurrentFolder() {
   platformMeshes.forEach((mesh, folderId) => {
     const f = FOLDER_GRAPH[folderId];
     mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
+  });
+
+  // Show/hide floor labels with platforms
+  folderLabels.forEach((label, folderId) => {
+    const f = FOLDER_GRAPH[folderId];
+    label.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
   });
 
   // Show/hide nodes for current depth and next depth (no text on distant nodes)
