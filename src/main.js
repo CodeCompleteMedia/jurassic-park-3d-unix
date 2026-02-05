@@ -33,7 +33,7 @@ const CONFIG = {
   node: {
     count: { min: 9, max: 12 },
     size: { w: 3.2, h: 1.2, d: 3.2 },
-    spacing: 4
+    spacing: 10
   },
   camera: {
     fov: 78,
@@ -467,8 +467,8 @@ function createNodes(folder) {
     // Add icon detail on top
     addNodeIcon(mesh, node.icon);
 
-    // Create hit target (invisible, larger)
-    const hitGeometry = new THREE.BoxGeometry(CONFIG.node.size.w * 1.5, CONFIG.node.size.h * 2, CONFIG.node.size.d * 1.5);
+    // Create hit target (invisible, slightly larger but shallower to avoid label interference)
+    const hitGeometry = new THREE.BoxGeometry(CONFIG.node.size.w * 1.5, CONFIG.node.size.h * 2, CONFIG.node.size.d);
     const hitMaterial = new THREE.MeshBasicMaterial({
       visible: false,
       side: THREE.DoubleSide
@@ -533,7 +533,7 @@ function createNodeLabel(node, position) {
 
   const sprite = new THREE.Sprite(spriteMaterial);
   sprite.position.copy(position);
-  sprite.position.y += CONFIG.node.size.h + 1.5;
+  sprite.position.z += 10;
   sprite.scale.set(6, 1.5, 1);
 
   sprite.userData = { nodeId: node.id, baseOpacity: 0 };
