@@ -325,7 +325,7 @@ function createPlatform(folder) {
   // Node dimensions and spacing
   const nodeWidth = CONFIG.node.size.w;
   const nodeDepth = CONFIG.node.size.d;
-  const gap = 1.5; // Space between nodes
+  const gap = CONFIG.node.spacing; // Space between nodes
   const padding = gap * 2; // Padding is 2x the gap (equal space around grid)
 
   // Calculate total grid dimensions
