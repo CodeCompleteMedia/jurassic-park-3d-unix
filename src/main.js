@@ -89,7 +89,10 @@ let haloMesh = null;
 let clock;
 let raycastTargets = [];
 
-function init() {
+async function init() {
+  // Wait for custom font to load before creating text textures
+  await document.fonts.load('bold 72px "JpFont"');
+
   // Scene
   scene = new THREE.Scene();
   scene.background = new THREE.Color(CONFIG.colors.background);
@@ -296,7 +299,7 @@ function calculateFolderPositions() {
   Object.keys(depthFolders).forEach(depth => {
     const folders = depthFolders[depth];
     const count = folders.length;
-    const spacing = 35;
+    const spacing = 75;
 
     folders.forEach((folder, index) => {
       // Center the group around x=0
@@ -365,15 +368,15 @@ function createPlatform(folder) {
 function createFloorLabel(folder, xPos, zPos, platformDepth) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = 512;
-  canvas.height = 128;
+  canvas.width = 2048;
+  canvas.height = 512;
 
   ctx.fillStyle = 'transparent';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const displayName = folder.name.replace(/^\//, '').toUpperCase();
+  const displayName = folder.name.replace(/^\//, '').toLowerCase();
 
-  ctx.font = 'bold 72px "Courier New", monospace';
+  ctx.font = 'bold 216px "JpFont", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#c96b63';
@@ -386,7 +389,7 @@ function createFloorLabel(folder, xPos, zPos, platformDepth) {
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
 
-  const planeGeometry = new THREE.PlaneGeometry(14, 3.5);
+  const planeGeometry = new THREE.PlaneGeometry(56, 14);
   const planeMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
@@ -510,13 +513,13 @@ function createNodeLabel(node, position) {
   ctx.fillStyle = 'transparent';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.font = 'bold 24px "Courier New", monospace';
+  ctx.font = 'bold 24px "JpFont", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#00e0d6';
   ctx.shadowColor = '#00e0d6';
   ctx.shadowBlur = 10;
-  ctx.fillText(node.label.toUpperCase(), canvas.width / 2, canvas.height / 2);
+  ctx.fillText(node.label.toLowerCase(), canvas.width / 2, canvas.height / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
