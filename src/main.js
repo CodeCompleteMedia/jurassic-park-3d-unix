@@ -524,21 +524,23 @@ function createNodeLabel(node, position) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
 
-  const spriteMaterial = new THREE.SpriteMaterial({
+  const planeGeometry = new THREE.PlaneGeometry(6, 1.5);
+  const planeMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
     opacity: 0,
+    side: THREE.DoubleSide,
     depthWrite: false
   });
 
-  const sprite = new THREE.Sprite(spriteMaterial);
-  sprite.position.copy(position);
-  sprite.position.z += CONFIG.node.size.d / 2 + 1;
-  sprite.scale.set(6, 1.5, 1);
+  const label = new THREE.Mesh(planeGeometry, planeMaterial);
+  label.position.copy(position);
+  label.position.z += CONFIG.node.size.d / 2 + 1;
+  label.rotation.x = -Math.PI / 2;
 
-  sprite.userData = { nodeId: node.id, baseOpacity: 0 };
-  scene.add(sprite);
-  nodeMeshes.get(node.id).label = sprite;
+  label.userData = { nodeId: node.id, baseOpacity: 0 };
+  scene.add(label);
+  nodeMeshes.get(node.id).label = label;
 }
 
 function createHalo() {
