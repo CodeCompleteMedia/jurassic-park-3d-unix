@@ -32,7 +32,7 @@ const CONFIG = {
   },
   node: {
     count: { min: 9, max: 12 },
-    size: { w: 3.2, h: 1.2, d: 3.2 },
+    size: { w: 4, h: 1.2, d: 4 },
     spacing: 2
   },
   camera: {
