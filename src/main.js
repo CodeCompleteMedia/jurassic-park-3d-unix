@@ -533,7 +533,7 @@ function createNodeLabel(node, position) {
 
   const sprite = new THREE.Sprite(spriteMaterial);
   sprite.position.copy(position);
-  sprite.position.y -= CONFIG.node.size.h / 2 + 1;
+  sprite.position.z += CONFIG.node.size.d / 2 + 1;
   sprite.scale.set(6, 1.5, 1);
 
   sprite.userData = { nodeId: node.id, baseOpacity: 0 };
