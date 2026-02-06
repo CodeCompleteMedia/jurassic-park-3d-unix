@@ -152,6 +152,7 @@ async function init() {
 
   // Initialize folder view
   showCurrentFolder();
+  updateConnectionVisibility();
 
   // Halo
   createHalo();
@@ -654,6 +655,17 @@ function drawFolderConnections() {
   console.log('Folder connections drawn:', connectionCount);
 }
 
+// Only update visibility - don't redraw
+function updateConnectionVisibility() {
+  const depthIndex = FOLDER_GRAPH[state.currentFolderId].depth;
+
+  connectionLines.children.forEach(line => {
+    // Check if both folders are visible
+    // Lines are at floor level, so just show them
+    line.visible = true;
+  });
+}
+
 function showCurrentFolder() {
   const folder = FOLDER_GRAPH[state.currentFolderId];
   const depthIndex = folder.depth;
@@ -988,11 +1000,6 @@ function deselectNode() {
   nodeMeshes.forEach(({ material }) => {
     material.emissiveIntensity = 0.1;
   });
-
-  // Clear connections
-  while (connectionLines.children.length > 0) {
-    connectionLines.remove(connectionLines.children[0]);
-  }
 
   document.getElementById('status-line').textContent = 'SELECT NODE';
 }
