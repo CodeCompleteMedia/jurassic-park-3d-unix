@@ -28,10 +28,10 @@
       src: local('Courier New'), local('Lucida Console'), local('Monaco');
     }
 
-    /* Desktop Background - Classic CDE Teal/Gray */
+    /* Desktop Background - Classic Windows 95/X11 Gray */
     body {
       overflow: hidden;
-      background: #4d5d6d;
+      background: #008080;
       font-family: 'Helvetica', 'Arial', sans-serif;
       cursor: default;
       user-select: none;
@@ -44,10 +44,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #3a4d5c 0%, #4d5d6d 50%, #5a6b7a 100%);
+      background: #008080;
     }
 
-    /* Subtle grid pattern overlay */
+    /* Subtle gradient for desktop depth */
     #desktop::before {
       content: '';
       position: absolute;
@@ -55,26 +55,38 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 100px 100px;
-      pointer-events: none;
+      background: linear-gradient(135deg, #006666 0%, #008080 50%, #009999 100%);
+      z-index: 0;
     }
 
-    /* X Window System Window */
+    /* Subtle pattern overlay */
+    #desktop::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0,0,0,0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* X Window System Window - Early 90s Motif/X11 Style */
     #xterm-window {
       position: absolute;
       left: 50%;
       top: 40px;
       transform: translateX(-50%);
-      background: #3d3d3d;
-      border: 2px solid #7a7a7a;
+      background: #c0c0c0;
+      border: 2px solid #000000;
       border-radius: 0;
       box-shadow:
-        2px 2px 0 #2a2a2a,
-        inset 1px 1px 0 #5a5a5a,
-        0 10px 30px rgba(0,0,0,0.4);
+        1px 1px 0 #ffffff,
+        -1px -1px 0 #808080,
+        2px 2px 5px rgba(0,0,0,0.3);
       min-width: 600px;
       min-height: 400px;
       display: flex;
@@ -116,93 +128,91 @@
       opacity: 0.5;
     }
 
-    /* X Window Title Bar */
+    /* X Window Title Bar - Early 90s Style */
     .x-titlebar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 24px;
-      background: linear-gradient(180deg, #636363 0%, #4a4a4a 100%);
-      border-bottom: 1px solid #2a2a2a;
-      padding: 0 4px;
+      height: 20px;
+      background: #c0c0c0;
+      border-bottom: 1px solid #000000;
+      padding: 0 2px;
     }
 
     .x-titlebar.inactive {
-      background: linear-gradient(180deg, #525252 0%, #404040 100%);
+      background: #c0c0c0;
     }
 
     .x-title {
       display: flex;
       align-items: center;
-      gap: 6px;
-      color: #cccccc;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      gap: 4px;
+      color: #000000;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0;
+      font-family: 'Helvetica', 'Arial', sans-serif;
     }
 
     .x-icon {
-      width: 16px;
-      height: 16px;
-      background: linear-gradient(135deg, #6b8cce 0%, #4a6aa8 100%);
-      border-radius: 2px;
+      width: 14px;
+      height: 14px;
+      background: #000080;
+      border: 1px solid #808080;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 9px;
       color: white;
+      font-weight: bold;
     }
 
     .x-controls {
       display: flex;
-      gap: 3px;
+      gap: 2px;
     }
 
     .x-btn {
-      width: 18px;
-      height: 18px;
-      border: 1px solid #5a5a5a;
-      background: linear-gradient(180deg, #6a6a6a 0%, #525252 100%);
-      color: #cccccc;
-      font-size: 10px;
+      width: 16px;
+      height: 14px;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      background: #c0c0c0;
+      color: #000000;
+      font-size: 9px;
       font-weight: bold;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.1s;
+      font-family: 'Arial', sans-serif;
+      padding: 0;
     }
 
     .x-btn:hover {
-      background: linear-gradient(180deg, #7a7a7a 0%, #626262 100%);
+      background: #d4d0c8;
     }
 
     .x-btn:active {
-      background: linear-gradient(180deg, #525252 0%, #4a4a4a 100%);
-      transform: inset 1px 1px 2px rgba(0,0,0,0.3);
+      border-color: #000000 #ffffff #ffffff #000000;
+      background: #a0a0a0;
     }
 
     .x-btn.close {
-      background: linear-gradient(180deg, #c44 0%, #a33 100%);
-      border-color: #822;
-      color: white;
+      background: #c0c0c0;
     }
 
-    .x-btn.close:hover {
-      background: linear-gradient(180deg, #d55 0%, #b44 100%);
-    }
-
-    /* Menu Bar inside window */
+    /* Menu Bar inside window - Early 90s Style */
     .x-menubar {
       display: flex;
-      background: #4a4a4a;
-      border-bottom: 1px solid #2a2a2a;
-      padding: 2px 6px;
-      gap: 4px;
+      background: #c0c0c0;
+      border-bottom: 1px solid #808080;
+      padding: 1px 4px;
+      gap: 0;
     }
 
     .x-menu-item {
-      color: #cccccc;
+      color: #000000;
       font-size: 11px;
       padding: 2px 8px;
       cursor: pointer;
@@ -210,20 +220,22 @@
     }
 
     .x-menu-item:hover {
-      background: #6b8cce;
+      background: #000080;
       color: white;
-      border-color: #4a6aa8;
+      border: 1px solid #000000;
     }
 
-    /* X Window Content Area */
+    /* X Window Content Area - Early 90s Style */
     .x-content {
-      background: #1a1a1a;
+      background: #ffffff;
       padding: 0;
       flex: 1;
       min-height: 0;
       position: relative;
       display: flex;
       flex-direction: column;
+      border: 1px solid #808080;
+      margin: 2px;
     }
 
     #canvas-container {
@@ -236,104 +248,123 @@
       display: block;
     }
 
-    /* Terminal/Prompt styling inside window */
+    /* Toolbar inside window - Early 90s Style */
     .x-toolbar {
-      background: #454545;
-      border-bottom: 1px solid #2a2a2a;
-      padding: 4px 8px;
+      background: #c0c0c0;
+      border-bottom: 1px solid #808080;
+      padding: 3px 6px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
     }
 
     .x-toolbar-btn {
-      background: transparent;
-      border: 1px solid #5a5a5a;
-      color: #cccccc;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      color: #000000;
       font-size: 10px;
-      padding: 2px 8px;
+      padding: 1px 6px;
       cursor: pointer;
+      font-family: 'Arial', sans-serif;
     }
 
     .x-toolbar-btn:hover {
-      background: #5a5a5a;
+      background: #d4d0c8;
+    }
+
+    .x-toolbar-btn:active {
+      border-color: #000000 #ffffff #ffffff #000000;
+      background: #a0a0a0;
     }
 
     .x-separator {
-      width: 1px;
+      width: 2px;
       height: 16px;
-      background: #5a5a5a;
+      background: linear-gradient(90deg, #808080 50%, #ffffff 50%);
     }
 
     .x-path {
-      color: #8a8a8a;
+      color: #000000;
       font-size: 11px;
       font-family: 'Courier New', monospace;
+      background: #ffffff;
+      border: 1px solid #808080;
+      padding: 1px 4px;
     }
 
-    /* CDE-style Taskbar at bottom */
+    /* CDE-style Taskbar at bottom - Early 90s Style */
     #cde-taskbar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 28px;
-      background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
-      border-top: 2px solid #6a6a6a;
+      height: 26px;
+      background: #c0c0c0;
+      border-top: 2px solid #000000;
       display: flex;
       align-items: center;
-      padding: 0 4px;
+      padding: 0 2px;
       z-index: 1000;
     }
 
     .cde-start-btn {
       display: flex;
       align-items: center;
-      gap: 4px;
-      background: linear-gradient(180deg, #6b8cce 0%, #4a6aa8 100%);
-      border: 1px solid #3a5a88;
-      color: white;
+      gap: 3px;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      color: #000000;
       font-size: 11px;
       font-weight: bold;
-      padding: 2px 8px;
+      padding: 1px 6px;
       cursor: pointer;
-      margin-right: 4px;
+      margin-right: 3px;
+      font-family: 'Arial', sans-serif;
     }
 
     .cde-start-btn:hover {
-      background: linear-gradient(180deg, #7a9cde 0%, #5a7ab8 100%);
+      background: #d4d0c8;
+    }
+
+    .cde-start-btn:active {
+      border-color: #000000 #ffffff #ffffff #000000;
+      background: #a0a0a0;
     }
 
     .cde-task-button {
-      background: linear-gradient(180deg, #525252 0%, #454545 100%);
-      border: 1px solid #5a5a5a;
-      color: #cccccc;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      color: #000000;
       font-size: 11px;
-      padding: 3px 12px;
+      padding: 2px 10px;
       cursor: pointer;
       margin-right: 2px;
       min-width: 100px;
       text-align: left;
+      font-family: 'Arial', sans-serif;
     }
 
     .cde-task-button:hover {
-      background: linear-gradient(180deg, #5a5a5a 0%, #525252 100%);
-      border-color: #7a7a7a;
+      background: #d4d0c8;
     }
 
     .cde-task-button.active {
-      background: linear-gradient(180deg, #3a4a5a 0%, #2a3a4a 100%);
-      border-color: #6b8cce;
-      color: white;
+      border-color: #000000 #ffffff #ffffff #000000;
+      background: #a0a0a0;
     }
 
     .cde-clock {
       margin-left: auto;
-      color: #cccccc;
+      color: #000000;
       font-size: 11px;
       padding: 2px 8px;
-      background: #2a2a2a;
-      border: 1px solid #4a4a4a;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      font-family: 'Arial', sans-serif;
     }
 
     /* CRT scanline effect overlay */
@@ -446,7 +477,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: #3a3a3a;
+      background: #c0c0c0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -458,18 +489,19 @@
     }
 
     #loading .loader {
-      color: #cccccc;
+      color: #000000;
       font-size: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: 'Arial', sans-serif;
     }
 
     #loading .loader::before {
       content: '';
       width: 16px;
       height: 16px;
-      border: 2px solid #6b8cce;
+      border: 2px solid #000000;
       border-top-color: transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -479,16 +511,16 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Lore panel - X Window Style */
+    /* Lore panel - Early 90s Style */
     #lore-panel {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #3d3d3d;
-      border: 2px solid #7a7a7a;
+      background: #c0c0c0;
+      border: 2px solid #000000;
       min-width: 350px;
-      box-shadow: 2px 2px 0 #2a2a2a, 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
       z-index: 500;
       display: none;
     }
@@ -498,39 +530,44 @@
     }
 
     #lore-panel .x-titlebar {
-      background: linear-gradient(180deg, #525252 0%, #454545 100%);
+      background: #c0c0c0;
+      border-bottom: 1px solid #000000;
     }
 
     #lore-panel .x-title {
-      color: #8ac;
+      color: #000000;
     }
 
     #lore-panel .x-content {
-      background: #2a2a2a;
-      padding: 20px;
+      background: #ffffff;
+      padding: 15px;
+      border: 1px solid #808080;
+      margin: 3px;
     }
 
     #lore-panel h3 {
-      color: #8ac;
-      font-size: 13px;
-      margin-bottom: 12px;
-      font-weight: normal;
+      color: #000080;
+      font-size: 12px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-family: 'Arial', sans-serif;
     }
 
     #lore-panel p {
-      color: #aabbcc;
+      color: #000000;
       font-size: 12px;
-      line-height: 1.6;
+      line-height: 1.5;
+      font-family: 'Arial', sans-serif;
     }
 
-    /* Terminal Puzzle UI - X Terminal Style */
+    /* Terminal Puzzle UI - Early 90s Style */
     #terminal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.6);
       display: none;
       justify-content: center;
       align-items: center;
@@ -542,79 +579,77 @@
     }
 
     #terminal-window {
-      background: #3d3d3d;
-      border: 2px solid #7a7a7a;
-      box-shadow: 2px 2px 0 #2a2a2a;
+      background: #c0c0c0;
+      border: 2px solid #000000;
       min-width: 450px;
     }
 
     #terminal-window .x-titlebar {
-      background: linear-gradient(180deg, #4a6a4a 0%, #3a5a3a 100%);
+      background: #c0c0c0;
+      border-bottom: 1px solid #000000;
     }
 
     #terminal-window .x-title {
-      color: #8cce8c;
-    }
-
-    #terminal-window .x-btn.close {
-      background: linear-gradient(180deg, #8c4 0%, #6a3 100%);
-      border-color: #482;
-      color: white;
+      color: #000000;
     }
 
     #terminal-window .x-content {
-      background: #1a1a1a;
-      padding: 20px;
+      background: #ffffff;
+      padding: 15px;
+      border: 1px solid #808080;
+      margin: 3px;
     }
 
     #terminal-header {
-      color: #00ff00;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      margin-bottom: 15px;
+      color: #000000;
+      font-family: 'Arial', sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #c0c0c0;
     }
 
     #terminal-prompt {
-      color: #00ff00;
-      font-family: 'Courier New', monospace;
-      margin-bottom: 15px;
+      color: #000000;
+      font-family: 'Arial', sans-serif;
+      margin-bottom: 10px;
     }
 
     #terminal-prompt p {
       font-size: 11px;
-      color: #00aa00;
-      margin-bottom: 8px;
+      color: #000000;
+      margin-bottom: 6px;
     }
 
     #terminal-input {
       width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #00ff00;
-      color: #00ff00;
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 16px;
-      padding: 8px 0;
+      background: #ffffff;
+      border: 2px inset #808080;
+      color: #000000;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      padding: 4px 6px;
       outline: none;
       letter-spacing: 2px;
     }
 
     #terminal-input:focus {
-      border-bottom-color: #00ff00;
+      border: 2px inset #808080;
     }
 
     #terminal-hint {
-      color: #00aa00;
+      color: #000000;
       font-size: 10px;
-      margin-top: 15px;
-      font-family: 'Courier New', monospace;
+      margin-top: 10px;
+      font-family: 'Arial', sans-serif;
     }
 
     #terminal-feedback {
-      margin-top: 15px;
-      padding: 10px;
+      margin-top: 12px;
+      padding: 8px;
       font-size: 11px;
-      font-family: 'Courier New', monospace;
+      font-family: 'Arial', sans-serif;
       display: none;
     }
 
@@ -623,77 +658,79 @@
     }
 
     #terminal-feedback.success {
-      background: rgba(0, 100, 0, 0.3);
-      border: 1px solid #00ff00;
-      color: #00ff00;
+      background: #c0c0c0;
+      border: 2px inset #808080;
+      color: #000000;
     }
 
     #terminal-feedback.error {
-      background: rgba(100, 0, 0, 0.3);
-      border: 1px solid #ff4444;
-      color: #ff6666;
+      background: #c0c0c0;
+      border: 2px inset #808080;
+      color: #000000;
     }
 
     .password-parts {
       display: flex;
       gap: 8px;
-      margin-top: 15px;
+      margin-top: 12px;
       justify-content: center;
     }
 
     .password-part {
       padding: 4px 10px;
       font-size: 10px;
-      font-family: 'Courier New', monospace;
-      border: 1px solid #444;
-      color: #666;
+      font-family: 'Arial', sans-serif;
+      border: 2px outset #ffffff;
+      background: #c0c0c0;
+      color: #000000;
     }
 
     .password-part.found {
-      border-color: #00ff00;
-      color: #00ff00;
-      background: rgba(0, 255, 0, 0.1);
+      border: 2px inset #808080;
+      background: #a0a0a0;
     }
 
     .password-part.valid {
-      border-color: #00ff00;
-      color: #00ff00;
-      background: rgba(0, 255, 0, 0.2);
+      border: 2px inset #808080;
+      background: #a0a0a0;
     }
 
     .password-part.invalid {
-      border-color: #ff4444;
-      color: #ff6666;
-      background: rgba(255, 0, 0, 0.1);
+      border: 2px inset #808080;
+      background: #a0a0a0;
     }
 
     #terminal-window #skip-puzzle-btn {
       display: block;
-      margin: 15px auto 0;
-      padding: 6px 12px;
-      background: transparent;
-      border: 1px solid #555;
-      color: #888;
-      font-family: 'Courier New', monospace;
+      margin: 12px auto 0;
+      padding: 4px 12px;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #000000 #000000 #ffffff;
+      color: #000000;
+      font-family: 'Arial', sans-serif;
       font-size: 10px;
       cursor: pointer;
     }
 
     #terminal-window #skip-puzzle-btn:hover {
-      border-color: #ffaa00;
-      color: #ffaa00;
+      background: #d4d0c8;
     }
 
-    /* Clue Panel - X Window Style */
+    #terminal-window #skip-puzzle-btn:active {
+      border-color: #000000 #ffffff #ffffff #000000;
+      background: #a0a0a0;
+    }
+
+    /* Clue Panel - Early 90s Style */
     #clue-panel {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #3d3d3d;
-      border: 2px solid #7a7a7a;
+      background: #c0c0c0;
+      border: 2px solid #000000;
       min-width: 400px;
-      box-shadow: 2px 2px 0 #2a2a2a;
       z-index: 600;
       display: none;
     }
@@ -703,29 +740,35 @@
     }
 
     #clue-panel .x-titlebar {
-      background: linear-gradient(180deg, #525252 0%, #454545 100%);
+      background: #c0c0c0;
+      border-bottom: 1px solid #000000;
     }
 
     #clue-panel .x-content {
-      background: #2a2a2a;
-      padding: 20px;
+      background: #ffffff;
+      padding: 15px;
+      border: 1px solid #808080;
+      margin: 3px;
     }
 
     #clue-panel .clue-header {
-      color: #8ac;
+      color: #000080;
       font-size: 12px;
-      margin-bottom: 15px;
-      font-weight: normal;
+      margin-bottom: 12px;
+      font-weight: bold;
+      font-family: 'Arial', sans-serif;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #c0c0c0;
     }
 
     #clue-panel .clue-content {
-      color: #aabbcc;
-      font-family: 'Courier New', monospace;
+      color: #000000;
+      font-family: 'Arial', sans-serif;
       font-size: 12px;
-      line-height: 1.7;
+      line-height: 1.5;
     }
 
-    /* Win overlay */
+    /* Win overlay - Early 90s Style */
     #win-overlay {
       position: fixed;
       top: 0;
@@ -735,7 +778,7 @@
       display: none;
       justify-content: center;
       align-items: center;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 128, 128, 0.8);
       z-index: 2000;
     }
 
@@ -744,22 +787,26 @@
     }
 
     #win-content {
+      background: #c0c0c0;
+      border: 2px solid #000000;
+      padding: 30px 40px;
       text-align: center;
-      color: #00ff00;
-      font-family: 'Courier New', monospace;
     }
 
     #win-content h1 {
-      font-size: 32px;
-      font-weight: normal;
-      letter-spacing: 4px;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 2px;
       margin-bottom: 15px;
+      color: #000080;
+      font-family: 'Arial', sans-serif;
     }
 
     #win-content p {
       font-size: 12px;
-      color: #00aa00;
-      letter-spacing: 2px;
+      color: #000000;
+      letter-spacing: 1px;
+      font-family: 'Arial', sans-serif;
     }
   </style>
 </head>
