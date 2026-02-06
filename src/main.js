@@ -285,7 +285,23 @@ function buildAllPlatforms() {
 // Calculate folder positions for visual branching layout
 function calculateFolderPositions() {
   const positions = {};
+  const folderWidths = {};
   const depthFolders = {};
+
+  // First pass: calculate each folder's platform width
+  Object.values(FOLDER_GRAPH).forEach(folder => {
+    const numNodes = folder.nodes.length;
+    const cols = Math.ceil(Math.sqrt(numNodes));
+    const nodeWidth = CONFIG.node.size.w;
+    const nodeDepth = CONFIG.node.size.d;
+    const gap = CONFIG.node.spacing;
+    const padding = gap * 2;
+
+    const gridWidth = cols * nodeWidth + (cols - 1) * gap;
+    const width = gridWidth + padding * 2;
+    const scale = Math.pow(0.92, folder.depth);
+    folderWidths[folder.id] = width * scale;
+  });
 
   // Group folders by depth
   Object.values(FOLDER_GRAPH).forEach(folder => {
@@ -295,17 +311,28 @@ function calculateFolderPositions() {
     depthFolders[folder.depth].push(folder);
   });
 
-  // Calculate X positions for each folder at each depth
+  // Calculate X positions with 75 units edge-to-edge
+  const edgeGap = 75;
+
   Object.keys(depthFolders).forEach(depth => {
     const folders = depthFolders[depth];
     const count = folders.length;
-    const spacing = 75;
 
+    // Calculate total width including gaps
+    let totalWidth = 0;
     folders.forEach((folder, index) => {
-      // Center the group around x=0
-      const totalWidth = (count - 1) * spacing;
-      const startX = -totalWidth / 2;
-      positions[folder.id] = startX + index * spacing;
+      totalWidth += folderWidths[folder.id];
+      if (index < count - 1) {
+        totalWidth += edgeGap;
+      }
+    });
+
+    // Position folders centered around x=0
+    let currentX = -totalWidth / 2;
+    folders.forEach((folder, index) => {
+      const halfWidth = folderWidths[folder.id] / 2;
+      positions[folder.id] = currentX + halfWidth;
+      currentX += folderWidths[folder.id] + edgeGap;
     });
   });
 
