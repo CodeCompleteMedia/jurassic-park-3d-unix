@@ -5,7 +5,9 @@
     "depth": 0,
     "nodes": [
       { "id": "readme_access", "label": "README_ACCESS", "type": "clue", "clueId": "readme_access", "icon": "paper", "enterable": false },
-      { "id": "terminal_access", "label": "TERMINAL", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock" },
+      { "id": "terminal_access", "label": "SECURITY", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock", "terminalId": "auth_main" },
+      { "id": "terminal_fake1", "label": "ADMIN", "type": "terminal", "enterable": false, "nextFolderId": "trash_empty", "icon": "lock", "terminalId": "auth_fake" },
+      { "id": "terminal_fake2", "label": "ROOT", "type": "terminal", "enterable": false, "nextFolderId": "var_locked", "icon": "lock", "terminalId": "auth_fake" },
       { "id": "usr_ingn_memo", "label": "ops_memo", "type": "clue", "clueId": "usr_ingn_memo", "icon": "paper", "enterable": false },
       { "id": "paddock_status_log", "label": "paddock", "type": "clue", "clueId": "paddock_status_log", "icon": "paper", "enterable": false },
       { "id": "incident_report", "label": "incident", "type": "clue", "clueId": "incident_report", "icon": "paper", "enterable": false },
@@ -358,6 +360,32 @@
       { "id": "ovr_wu_lab", "label": "WU_LAB", "type": "lore", "enterable": false, "icon": "paper", "parentName": "override", "loreText": "Lab safety override. Airlocks and cold storage alarms set to 'ignore'." },
       { "id": "ovr_ingen_key", "label": "INGEN_KEY", "type": "lore", "enterable": false, "icon": "lock", "parentName": "override", "loreText": "InGen master key. Access restricted to executives." },
       { "id": "ovr_spare_codes", "label": "SPARE_CODES", "type": "lore", "enterable": false, "icon": "paper", "parentName": "override", "loreText": "Spare code list note: 'Do not store plaintext'. File is plaintext." }
+    ]
+  },
+
+  "trash_empty": {
+    "id": "trash_empty",
+    "name": "/tmp/trash",
+    "depth": 1,
+    "nodes": [
+      { "id": "trash_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files. This folder has been cleared." },
+      { "id": "trash_deleted", "label": "DELETED", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_old", "label": "old_cache", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "trash_crash", "label": "crash_dump", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_info", "label": "INFO", "type": "lore", "enterable": false, "icon": "paper", "loreText": "This temporary directory has been purged. No recoverable data." }
+    ]
+  },
+
+  "var_locked": {
+    "id": "var_locked",
+    "name": "/var/lock",
+    "depth": 1,
+    "nodes": [
+      { "id": "lock_info", "label": "README", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Lock files directory. All locks are system-managed." },
+      { "id": "lock_daemon", "label": "daemon", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "lock_proc", "label": "proc", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "lock_sys", "label": "sys", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "lock_readme2", "label": "NOTICE", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Access denied. This subsystem is locked by the main security daemon." }
     ]
   }
 }

@@ -394,6 +394,25 @@
       color: #00ff00;
     }
 
+    .terminal-nav-btn {
+      width: 100%;
+      padding: 12px 20px;
+      background: transparent;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 14px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .terminal-nav-btn:hover {
+      background: rgba(0, 255, 0, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    }
+
     #terminal-feedback.error {
       background: rgba(255, 0, 0, 0.1);
       border: 1px solid #ff0000;
@@ -439,6 +458,7 @@
 
     .password-part.valid {
       border-color: #00ff00;
+      color: #00ff00;
       background: rgba(0, 255, 0, 0.2);
     }
 
@@ -533,10 +553,12 @@
   <div id="terminal-overlay">
     <div id="terminal-window">
       <div id="terminal-header">SECURITY CHECKPOINT</div>
-      <div id="terminal-prompt">
-        <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
-        <input type="text" id="terminal-input" class="terminal-input" placeholder="PASSWORD" autocomplete="off" />
-      </div>
+      <form id="terminal-form" autocomplete="off">
+        <div id="terminal-prompt">
+          <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
+          <input type="text" id="terminal-input" class="terminal-input" placeholder="PASSWORD" autofocus />
+        </div>
+      </form>
       <div class="password-parts">
         <div class="password-part" id="part-project">PROJECT</div>
         <div class="password-part" id="part-sector">SECTOR</div>

@@ -59,6 +59,7 @@ const state = {
   lastClickTime: 0,
   isTransitioning: false,
   isWon: false,
+  currentPuzzleId: null,
 
   // Navigation history: array of folder IDs from root to current
   navigationHistory: ['root_usr'],
@@ -1109,7 +1110,7 @@ function handleNodeClick(nodeId) {
     document.getElementById('status-line').textContent = 'PRESS FOR DATA';
   } else if (node.type === 'terminal') {
     // Check if puzzle already solved
-    const puzzleId = node.puzzleId || 'root_auth';
+    const puzzleId = getPuzzleId(node);
     if (isPuzzleSolved(state.currentFolderId, puzzleId)) {
       document.getElementById('status-line').textContent = 'ACCESS GRANTED - DOUBLE CLICK TO ENTER';
     } else {
@@ -1148,14 +1149,14 @@ function handleNodeDoubleClick(nodeId) {
 
   if (node.type === 'terminal') {
     // Check if puzzle already solved - if so, just enter the folder
-    const puzzleId = node.puzzleId || 'root_auth';
+    const puzzleId = getPuzzleId(node);
     if (isPuzzleSolved(state.currentFolderId, puzzleId)) {
       // Already solved - just navigate
       if (node.nextFolderId) {
         enterFolder(node.nextFolderId);
       }
     } else {
-      showTerminal();
+      showTerminal(node);
     }
     return;
   }
@@ -1488,39 +1489,62 @@ const PUZZLES = {
 // Node click handlers for puzzle nodes
 function handlePuzzleNodeClick(nodeId, nodeType) {
   if (nodeType === 'terminal') {
-    showTerminal();
+    const nodeData = nodeMeshes.get(nodeId);
+    if (nodeData) {
+      const nodeInfo = nodeData.mesh.userData.nodeData;
+      showTerminal(nodeInfo);
+    }
   } else if (nodeType === 'clue') {
     showClue(nodeId);
   }
 }
 
 // Show terminal UI
-function showTerminal() {
+function showTerminal(node) {
   const overlay = document.getElementById('terminal-overlay');
   const input = document.getElementById('terminal-input');
   const feedback = document.getElementById('terminal-feedback');
+  const form = document.getElementById('terminal-form');
+
+  // Store puzzle info
+  state.currentPuzzleId = getPuzzleId(node);
+  state.currentTerminalNextFolder = node.nextFolderId;
 
   // Reset state
   input.value = '';
   feedback.className = '';
   feedback.innerHTML = '';
   feedback.style.display = 'none';
+  document.querySelector('.terminal-close-hint').style.display = 'block';
 
-  // Update password part indicators based on found clues
+  // Reset all part indicators
+  const partNames = ['project', 'sector', 'keyword', 'number'];
   const puzzle = PUZZLES['root_auth'];
-  for (const [part, clue] of Object.entries(puzzle.clues)) {
+  for (const part of partNames) {
     const partEl = document.getElementById(`part-${part}`);
-    if (partEl && clue.found) {
-      partEl.classList.add('found');
+    if (partEl) {
+      // Reset to default, then add 'found' if clue was discovered
+      partEl.className = 'password-part';
+      if (puzzle.clues[part]?.found) {
+        partEl.classList.add('found');
+      }
     }
   }
 
   overlay.classList.add('visible');
 
-  // Focus input
+  // Focus input and setup form submission
   setTimeout(() => {
     input.focus();
-    input.addEventListener('keydown', handleTerminalKeydown);
+
+    // Remove old submit handler if exists
+    form.onsubmit = null;
+
+    // Add form submit handler (triggers on Enter)
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      submitPassword();
+    };
   }, 100);
 }
 
@@ -1554,10 +1578,11 @@ function submitPassword() {
   const input = document.getElementById('terminal-input');
   const feedback = document.getElementById('terminal-feedback');
   const password = input.value.trim().toUpperCase();
-  const puzzle = PUZZLES['root_auth'];
+  const puzzle = PUZZLES[state.currentPuzzleId] || PUZZLES['root_auth'];
 
   if (!password) {
     feedback.className = 'visible warning';
+    feedback.style.display = 'block';
     feedback.innerHTML = 'AUTH FAIL: NO INPUT DETECTED';
     return;
   }
@@ -1566,11 +1591,12 @@ function submitPassword() {
   const parts = password.split('-');
   if (parts.length !== 4) {
     feedback.className = 'visible warning';
+    feedback.style.display = 'block';
     feedback.innerHTML = 'AUTH FAIL: INVALID FORMAT (EXPECTED 4 PARTS)';
     return;
   }
 
-  // Check each part
+  // Check each part - only light up correct ones
   const partNames = ['PROJECT', 'SECTOR', 'KEYWORD', 'NUMBER'];
   const correctParts = puzzle.password.split('-');
   let allCorrect = true;
@@ -1580,40 +1606,37 @@ function submitPassword() {
     if (parts[i] === correctParts[i]) {
       partEl.className = 'password-part valid';
     } else {
-      // Check if it's a valid word but wrong position
-      const validWords = ['INGEN', 'PADDOCK10', 'MULDOON', '1993'];
-      if (validWords.includes(parts[i])) {
-        partEl.className = 'password-part invalid';
-      } else {
-        partEl.className = 'password-part';
-      }
       allCorrect = false;
     }
   }
 
   if (allCorrect) {
     feedback.className = 'visible success';
-    feedback.innerHTML = 'AUTH OK: ACCESS GRANTED<br>REDIRECTING...';
-
-    // Unlock and navigate
-    setTimeout(() => {
-      closeTerminal();
-      unlockPuzzle('root_auth');
-    }, 1500);
+    feedback.style.display = 'block';
+    feedback.innerHTML = '<div style="text-align: center;"><div style="font-size: 16px; margin-bottom: 15px;">*** AUTH OK: ACCESS GRANTED ***</div><button id="nav-continue-btn" class="terminal-nav-btn" onclick="continueToNextFolder()">CONTINUE &gt;&gt;</button></div>';
+    // Hide the ESC cancel hint
+    document.querySelector('.terminal-close-hint').style.display = 'none';
   } else {
     feedback.className = 'visible error';
+    feedback.style.display = 'block';
     feedback.innerHTML = 'AUTH FAILED: INVALID CREDENTIALS<br>HINT: Check your clue files for the correct parts.';
   }
 }
 
+// Global function for continue button
+window.continueToNextFolder = function() {
+  closeTerminal();
+  unlockPuzzle(state.currentPuzzleId, state.currentTerminalNextFolder);
+};
+
 function closeTerminal() {
   const overlay = document.getElementById('terminal-overlay');
-  const input = document.getElementById('terminal-input');
-  input.removeEventListener('keydown', handleTerminalKeydown);
+  const form = document.getElementById('terminal-form');
+  form.onsubmit = null;
   overlay.classList.remove('visible');
 }
 
-function unlockPuzzle(puzzleId) {
+function unlockPuzzle(puzzleId, nextFolderId) {
   const puzzle = PUZZLES[puzzleId];
   if (!puzzle) return;
 
@@ -1623,12 +1646,10 @@ function unlockPuzzle(puzzleId) {
   }
   state.puzzlesSolved[state.currentFolderId][puzzleId] = true;
 
-  // Find the gate node and enter the next folder
-  const folder = FOLDER_GRAPH[state.currentFolderId];
-  const gateNode = folder.nodes.find(n => n.type === 'terminal' && n.nextFolderId);
-
-  if (gateNode && gateNode.nextFolderId) {
-    enterFolder(gateNode.nextFolderId);
+  // Use provided nextFolderId or find from terminal node
+  const destinationFolder = nextFolderId || state.currentTerminalNextFolder;
+  if (destinationFolder) {
+    enterFolder(destinationFolder);
   }
 }
 
@@ -1744,6 +1765,12 @@ function closeClue() {
 // Check if puzzle is solved
 function isPuzzleSolved(folderId, puzzleId) {
   return state.puzzlesSolved[folderId]?.[puzzleId] === true;
+}
+
+// Get puzzle ID from node - always use root_auth for main puzzle
+function getPuzzleId(node) {
+  // All terminals use the same puzzle for now
+  return 'root_auth';
 }
 
 // ============================================
