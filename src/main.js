@@ -841,6 +841,31 @@ function setupEventListeners() {
 
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
+
+  // Close button handlers
+  document.getElementById('terminal-close-btn').addEventListener('click', closeTerminal);
+  document.getElementById('clue-close-btn').addEventListener('click', closeClue);
+  document.getElementById('lore-close-btn').addEventListener('click', closeLorePanel);
+
+  // DEV: Skip puzzle button
+  document.getElementById('skip-puzzle-btn').addEventListener('click', () => {
+    console.log('[DEV] Skipping current puzzle...');
+    // Find the terminal node and mark puzzle as solved
+    const folder = FOLDER_GRAPH[state.currentFolderId];
+    const terminalNode = folder?.nodes?.find(n => n.type === 'terminal');
+    if (terminalNode && terminalNode.nextFolderId) {
+      // Close the modal first
+      closeTerminal();
+      // Mark puzzle solved
+      if (!state.puzzlesSolved[state.currentFolderId]) {
+        state.puzzlesSolved[state.currentFolderId] = {};
+      }
+      state.puzzlesSolved[state.currentFolderId]['root_auth'] = true;
+      // Navigate
+      enterFolder(terminalNode.nextFolderId);
+      console.log('[DEV] Skipped to:', terminalNode.nextFolderId);
+    }
+  });
 }
 
 function onMouseMove(event) {
@@ -861,6 +886,13 @@ function onClick(event) {
   if (intersects.length > 0) {
     const target = intersects[0].object;
     const nodeId = target.userData.nodeId;
+    const nodeFolderId = target.userData.folderId;
+
+    // Only allow clicking nodes in the current folder
+    if (nodeFolderId !== state.currentFolderId) {
+      clearSelection();
+      return;
+    }
 
     if (isDoubleClick) {
       handleNodeDoubleClick(nodeId);
@@ -1328,6 +1360,10 @@ function showLore(text) {
   panel.classList.add('visible');
 }
 
+function closeLorePanel() {
+  document.getElementById('lore-panel').classList.remove('visible');
+}
+
 function triggerWin() {
   state.isWon = true;
   document.getElementById('status-line').textContent = 'SYSTEM RESTORED';
@@ -1399,7 +1435,9 @@ function animate() {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(raycastTargets);
 
-    const hoveredNodeId = intersects.length > 0 ? intersects[0].object.userData.nodeId : null;
+    // Only hover over nodes in the current folder
+    const validIntersect = intersects.find(hit => hit.object.userData.folderId === state.currentFolderId);
+    const hoveredNodeId = validIntersect ? validIntersect.object.userData.nodeId : null;
 
     // Only process changes when hover state actually changes
     if (hoveredNodeId !== state.hoveredNodeId) {
@@ -1524,7 +1562,6 @@ function showTerminal(node) {
   feedback.className = '';
   feedback.innerHTML = '';
   feedback.style.display = 'none';
-  document.querySelector('.terminal-close-hint').style.display = 'block';
 
   // Reset all part indicators
   const partNames = ['project', 'sector', 'keyword', 'number'];

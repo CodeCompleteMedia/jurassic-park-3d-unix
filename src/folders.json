@@ -5,9 +5,9 @@
     "depth": 0,
     "nodes": [
       { "id": "readme_access", "label": "README_ACCESS", "type": "clue", "clueId": "readme_access", "icon": "paper", "enterable": false },
-      { "id": "terminal_access", "label": "SECURITY", "type": "terminal", "enterable": false, "nextFolderId": "trash_empty", "icon": "lock", "terminalId": "auth_main" },
+      { "id": "terminal_access", "label": "SECURITY", "type": "terminal", "enterable": false, "nextFolderId": "tmp", "icon": "lock", "terminalId": "auth_main" },
       { "id": "terminal_fake1", "label": "ADMIN", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock", "terminalId": "auth_fake" },
-      { "id": "terminal_fake2", "label": "ROOT", "type": "terminal", "enterable": false, "nextFolderId": "var_locked", "icon": "lock", "terminalId": "auth_fake" },
+      { "id": "terminal_fake2", "label": "ROOT", "type": "terminal", "enterable": false, "nextFolderId": "var", "icon": "lock", "terminalId": "auth_fake" },
       { "id": "usr_ingn_memo", "label": "ops_memo", "type": "clue", "clueId": "usr_ingn_memo", "icon": "paper", "enterable": false },
       { "id": "paddock_status_log", "label": "paddock", "type": "clue", "clueId": "paddock_status_log", "icon": "paper", "enterable": false },
       { "id": "incident_report", "label": "incident", "type": "clue", "clueId": "incident_report", "icon": "paper", "enterable": false },
@@ -60,19 +60,6 @@
       { "id": "games_tetris", "label": "tetris", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
       { "id": "games_dino", "label": "dino_game", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Unfinished T-Rex escape simulation. 'Not ready for public release.'" },
       { "id": "games_rogue", "label": "rogue", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" }
-    ]
-  },
-
-  "trash_empty": {
-    "id": "trash_empty",
-    "name": "/tmp/trash",
-    "depth": 1,
-    "nodes": [
-      { "id": "trash_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files. This folder has been cleared." },
-      { "id": "trash_deleted", "label": "DELETED", "type": "dead", "enterable": false, "icon": "warning" },
-      { "id": "trash_old", "label": "old_cache", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "trash_crash", "label": "crash_dump", "type": "dead", "enterable": false, "icon": "warning" },
-      { "id": "trash_info", "label": "INFO", "type": "lore", "enterable": false, "icon": "paper", "loreText": "This temporary directory has been purged. No recoverable data." }
     ]
   },
 
@@ -376,9 +363,9 @@
     ]
   },
 
-  "var_locked": {
-    "id": "var_locked",
-    "name": "/var/lock",
+  "var": {
+    "id": "var",
+    "name": "/var",
     "depth": 1,
     "nodes": [
       { "id": "lock_info", "label": "README", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Lock files directory. All locks are system-managed." },
@@ -386,6 +373,32 @@
       { "id": "lock_proc", "label": "proc", "type": "dead", "enterable": false, "icon": "paper" },
       { "id": "lock_sys", "label": "sys", "type": "dead", "enterable": false, "icon": "paper" },
       { "id": "lock_readme2", "label": "NOTICE", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Access denied. This subsystem is locked by the main security daemon." }
+    ]
+  },
+
+  "tmp": {
+    "id": "tmp",
+    "name": "/tmp",
+    "depth": 1,
+    "nodes": [
+      { "id": "tmp_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files directory. Miscellaneous scratch space." },
+      { "id": "tmp_cache", "label": "cache", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Application cache files. Some corrupted." },
+      { "id": "tmp_trash_gate", "label": "trash", "type": "folderGate", "enterable": true, "nextFolderId": "trash", "icon": "folder" },
+      { "id": "tmp_temp", "label": "temp", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning" },
+      { "id": "tmp_readme", "label": "README", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary storage. Files may be deleted without warning." }
+    ]
+  },
+
+  "trash": {
+    "id": "trash",
+    "name": "/trash",
+    "depth": 2,
+    "nodes": [
+      { "id": "trash_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files. This folder has been cleared." },
+      { "id": "trash_deleted", "label": "DELETED", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_old", "label": "old_cache", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "trash_crash", "label": "crash_dump", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_info", "label": "INFO", "type": "lore", "enterable": false, "icon": "paper", "loreText": "This temporary directory has been purged. No recoverable data." }
     ]
   }
 }

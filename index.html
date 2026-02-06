@@ -224,14 +224,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(5, 6, 7, 0.95);
+      background: #0a0a0a;
       border: 1px solid #00e0d6;
-      padding: 30px;
+      padding: 0;
       max-width: 400px;
+      width: 90%;
       display: none;
       z-index: 150;
       opacity: 0;
       transition: opacity 0.3s ease;
+      box-shadow: 0 0 20px rgba(0, 224, 214, 0.2);
     }
 
     #lore-panel.visible {
@@ -239,8 +241,29 @@
       opacity: 1;
     }
 
+    #lore-panel .window-titlebar {
+      border-bottom-color: #00e0d6;
+    }
+
+    #lore-panel .window-title {
+      color: #00e0d6;
+    }
+
+    #lore-panel .window-btn.close {
+      color: #00e0d6;
+      border-color: #00e0d6;
+    }
+
+    #lore-panel .window-btn.close:hover {
+      background: rgba(0, 224, 214, 0.2);
+    }
+
+    #lore-panel .window-content {
+      padding: 20px 25px;
+    }
+
     #lore-panel h3 {
-      color: #4fffe9;
+      color: #00e0d6;
       font-size: 14px;
       letter-spacing: 2px;
       margin-bottom: 15px;
@@ -319,20 +342,69 @@
     #terminal-window {
       background: #0a0a0a;
       border: 1px solid #00ff00;
-      padding: 30px;
+      padding: 0;
       width: 500px;
       max-width: 90%;
       font-family: 'Courier New', 'Lucida Console', monospace;
-      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 50px rgba(0, 255, 0, 0.05);
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+    }
+
+    /* System window title bar */
+    .window-titlebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+      border-bottom: 1px solid #00ff00;
+    }
+
+    .window-title {
+      color: #00ff00;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .window-btn {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid #444;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Courier New', monospace;
+      line-height: 1;
+    }
+
+    .window-btn.close {
+      color: #00ff00;
+      border-color: #00ff00;
+    }
+
+    .window-btn.close:hover {
+      background: rgba(0, 255, 0, 0.2);
+    }
+
+    .window-content {
+      padding: 20px 25px 25px;
     }
 
     #terminal-header {
       color: #00ff00;
       font-size: 14px;
       letter-spacing: 2px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #00ff00;
-      padding-bottom: 10px;
+      margin-bottom: 15px;
       text-transform: uppercase;
     }
 
@@ -433,6 +505,24 @@
       letter-spacing: 2px;
     }
 
+    #terminal-window #skip-puzzle-btn {
+      display: block;
+      margin: 15px auto 0;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #444;
+      color: #666;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #terminal-window #skip-puzzle-btn:hover {
+      border-color: #ffaa00;
+      color: #ffaa00;
+    }
+
     /* Password part indicators */
     .password-parts {
       display: flex;
@@ -474,15 +564,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(10, 10, 10, 0.95);
+      background: #0a0a0a;
       border: 1px solid #7fd0e6;
-      padding: 30px;
+      padding: 0;
       max-width: 450px;
       width: 90%;
       z-index: 185;
       display: none;
       opacity: 0;
       transition: opacity 0.3s ease;
+      box-shadow: 0 0 20px rgba(127, 208, 230, 0.2);
     }
 
     #clue-panel.visible {
@@ -490,14 +581,33 @@
       opacity: 1;
     }
 
+    #clue-panel .window-titlebar {
+      border-bottom-color: #7fd0e6;
+    }
+
+    #clue-panel .window-title {
+      color: #7fd0e6;
+    }
+
+    #clue-panel .window-btn.close {
+      color: #7fd0e6;
+      border-color: #7fd0e6;
+    }
+
+    #clue-panel .window-btn.close:hover {
+      background: rgba(127, 208, 230, 0.2);
+    }
+
+    #clue-panel .window-content {
+      padding: 20px 25px;
+    }
+
     #clue-panel .clue-header {
       color: #7fd0e6;
       font-size: 12px;
       letter-spacing: 2px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       text-transform: uppercase;
-      border-bottom: 1px solid #7fd0e6;
-      padding-bottom: 10px;
     }
 
     #clue-panel .clue-content {
@@ -544,38 +654,59 @@
   </div>
 
   <div id="lore-panel">
-    <h3>DATA FILE</h3>
-    <p id="lore-text"></p>
-    <div class="close-hint">PRESS ANY KEY TO CLOSE</div>
+    <div class="window-titlebar">
+      <span class="window-title">DATA FILE</span>
+      <div class="window-controls">
+        <button class="window-btn close" id="lore-close-btn" title="Close">X</button>
+      </div>
+    </div>
+    <div class="window-content">
+      <p id="lore-text"></p>
+      <div class="close-hint">PRESS ANY KEY TO CLOSE</div>
+    </div>
   </div>
 
   <!-- Terminal Puzzle UI -->
   <div id="terminal-overlay">
     <div id="terminal-window">
-      <div id="terminal-header">SECURITY CHECKPOINT</div>
-      <form id="terminal-form" autocomplete="off">
-        <div id="terminal-prompt">
-          <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
-          <input type="text" id="terminal-input" class="terminal-input" placeholder="PASSWORD" autofocus />
+      <div class="window-titlebar">
+        <span class="window-title">SECURITY CHECKPOINT</span>
+        <div class="window-controls">
+          <button class="window-btn close" id="terminal-close-btn" title="Close (ESC)">X</button>
         </div>
-      </form>
-      <div class="password-parts">
-        <div class="password-part" id="part-project">PROJECT</div>
-        <div class="password-part" id="part-sector">SECTOR</div>
-        <div class="password-part" id="part-keyword">KEYWORD</div>
-        <div class="password-part" id="part-number">NUMBER</div>
       </div>
-      <div id="terminal-hint">Hint: Search /usr for clues. Format: PROJECT-SECTOR-KEYWORD-NUMBER</div>
-      <div id="terminal-feedback"></div>
-      <div class="terminal-close-hint">PRESS ESC TO CANCEL</div>
+      <div class="window-content">
+        <form id="terminal-form" autocomplete="off">
+          <div id="terminal-prompt">
+            <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
+            <input type="text" id="terminal-input" class="terminal-input" placeholder="PASSWORD" autofocus />
+          </div>
+        </form>
+        <div class="password-parts">
+          <div class="password-part" id="part-project">PROJECT</div>
+          <div class="password-part" id="part-sector">SECTOR</div>
+          <div class="password-part" id="part-keyword">KEYWORD</div>
+          <div class="password-part" id="part-number">NUMBER</div>
+        </div>
+        <div id="terminal-hint">Hint: Search /usr for clues. Format: PROJECT-SECTOR-KEYWORD-NUMBER</div>
+        <div id="terminal-feedback"></div>
+        <button id="skip-puzzle-btn" title="DEV: Skip this puzzle">[x] SKIP PUZZLE</button>
+      </div>
     </div>
   </div>
 
   <!-- Clue Panel -->
   <div id="clue-panel">
-    <div class="clue-header" id="clue-title">DATA FILE</div>
-    <div class="clue-content" id="clue-text"></div>
-    <div class="clue-close-hint">PRESS ANY KEY TO CLOSE</div>
+    <div class="window-titlebar">
+      <span class="window-title" id="clue-title">DATA FILE</span>
+      <div class="window-controls">
+        <button class="window-btn close" id="clue-close-btn" title="Close">X</button>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="clue-content" id="clue-text"></div>
+      <div class="clue-close-hint">PRESS ANY KEY TO CLOSE</div>
+    </div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
