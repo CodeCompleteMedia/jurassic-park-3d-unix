@@ -555,7 +555,7 @@ function createNodeLabel(node, position) {
   const planeMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
-    opacity: 0,
+    opacity: 1,
     side: THREE.DoubleSide,
     depthWrite: false
   });
@@ -1256,9 +1256,6 @@ function animate() {
           prevHover.mesh.position.y = calculateNodeY(prevHover.mesh.userData.folderId);
           prevHover.mesh.scale.set(1, 1, 1);
         }
-        if (prevHover && prevHover.label) {
-          prevHover.label.material.opacity = 0;
-        }
       }
 
       haloMesh.material.opacity = 0;
@@ -1273,11 +1270,6 @@ function animate() {
           const baseY = calculateNodeY(nodeData.mesh.userData.folderId);
           nodeData.mesh.position.y = baseY + 0.15;
           nodeData.mesh.scale.set(1.05, 1, 1.05);
-
-          // Show label
-          if (nodeData.label) {
-            nodeData.label.material.opacity = 0.9;
-          }
 
           // Move halo
           haloMesh.position.x = nodeData.mesh.position.x;
