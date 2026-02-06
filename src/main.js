@@ -623,9 +623,9 @@ function showCurrentFolder() {
     mesh.material.opacity = 1;
     mesh.material.transparent = false;
 
-    // Only show labels for current depth (hide distant text)
+    // Show labels for visible depths
     if (label) {
-      label.visible = isCurrentDepth;
+      label.visible = isVisibleDepth;
       label.material.opacity = 1;
     }
   });
