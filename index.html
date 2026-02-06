@@ -77,6 +77,8 @@
         0 10px 30px rgba(0,0,0,0.4);
       min-width: 600px;
       min-height: 400px;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Resize handle */
@@ -217,13 +219,17 @@
     .x-content {
       background: #1a1a1a;
       padding: 0;
-      height: 600px;
+      flex: 1;
+      min-height: 0;
       position: relative;
+      display: flex;
+      flex-direction: column;
     }
 
     #canvas-container {
       width: 100%;
-      height: 100%;
+      flex: 1;
+      min-height: 0;
     }
 
     canvas {
@@ -351,10 +357,10 @@
     /* UI Overlay for game elements */
     #ui-overlay {
       position: absolute;
-      top: 24px;
+      top: 0;
       left: 0;
       width: 100%;
-      height: calc(100% - 52px);
+      height: 100%;
       pointer-events: none;
       z-index: 50;
     }
