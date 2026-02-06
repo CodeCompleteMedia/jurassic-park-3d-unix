@@ -553,7 +553,7 @@ function createNodeLabel(node, position) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
 
-  const planeGeometry = new THREE.PlaneGeometry(6, 1.5);
+  const planeGeometry = new THREE.PlaneGeometry(12, 3);
   const planeMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
