@@ -148,6 +148,9 @@ async function init() {
   connectionLines = new THREE.Group();
   scene.add(connectionLines);
 
+  // Draw permanent folder connections
+  drawFolderConnections();
+
   // Halo
   createHalo();
 
@@ -588,6 +591,68 @@ function createHalo() {
   scene.add(haloMesh);
 }
 
+// Draw permanent bezier curves between connected folders
+function drawFolderConnections() {
+  // Clear existing
+  while (connectionLines.children.length > 0) {
+    connectionLines.remove(connectionLines.children[0]);
+  }
+
+  // Find which folders have connections to other folders
+  const folderConnections = {};
+
+  Object.values(FOLDER_GRAPH).forEach(folder => {
+    folder.nodes.forEach(node => {
+      if (node.nextFolderId) {
+        if (!folderConnections[folder.id]) {
+          folderConnections[folder.id] = new Set();
+        }
+        folderConnections[folder.id].add(node.nextFolderId);
+      }
+    });
+  });
+
+  // Draw bezier curve from each connected folder
+  Object.keys(folderConnections).forEach(fromFolderId => {
+    const toFolderIds = folderConnections[fromFolderId];
+    const fromPlatform = platformMeshes.get(fromFolderId);
+
+    if (!fromPlatform) return;
+
+    toFolderIds.forEach(toFolderId => {
+      const toPlatform = platformMeshes.get(toFolderId);
+      if (!toPlatform) return;
+
+      // Start from front edge of current folder
+      const start = fromPlatform.position.clone();
+      start.z += fromPlatform.userData.depth / 2 + 2;
+
+      // End at front edge of next folder
+      const end = toPlatform.position.clone();
+      end.z += toPlatform.userData.depth / 2 + 2;
+
+      // Create curved bezier path
+      const midZ = (start.z + end.z) / 2;
+      const curve = new THREE.QuadraticBezierCurve3(
+        start,
+        new THREE.Vector3(start.x, start.y + 15, midZ),
+        end
+      );
+
+      const points = curve.getPoints(30);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({
+        color: CONFIG.colors.gridAccent,
+        transparent: true,
+        opacity: 0.5
+      });
+
+      const line = new THREE.Line(geometry, material);
+      connectionLines.add(line);
+    });
+  });
+}
+
 function showCurrentFolder() {
   const folder = FOLDER_GRAPH[state.currentFolderId];
   const depthIndex = folder.depth;
@@ -598,6 +663,9 @@ function showCurrentFolder() {
 
   // Set camera to look at this folder
   setCameraToFolder(state.currentFolderId, true);
+
+  // Redraw folder connections for visible folders
+  drawFolderConnections();
 
   // Show/hide platforms: previous row + current + next 4 rows
   // This allows users to see at least 5 rows ahead
@@ -954,9 +1022,6 @@ function handleNodeClick(nodeId) {
     }
   });
 
-  // Show connections
-  showConnections(nodeId);
-
   // Update status
   const node = nodeData.mesh.userData.nodeData;
   if (node.type === 'lore') {
@@ -972,49 +1037,6 @@ function handleNodeClick(nodeId) {
 
 function clearSelection() {
   deselectNode();
-}
-
-function showConnections(fromNodeId) {
-  // Clear existing
-  while (connectionLines.children.length > 0) {
-    connectionLines.remove(connectionLines.children[0]);
-  }
-
-  const fromNode = nodeMeshes.get(fromNodeId);
-  if (!fromNode) return;
-
-  const nodeData = fromNode.mesh.userData.nodeData;
-
-  // Draw single bezier curve to next folder
-  if (nodeData.nextFolderId) {
-    const nextFolder = FOLDER_GRAPH[nodeData.nextFolderId];
-    const nextFolderPlatform = platformMeshes.get(nodeData.nextFolderId);
-
-    if (nextFolderPlatform) {
-      const start = fromNode.mesh.position.clone();
-      const end = nextFolderPlatform.position.clone();
-      end.y = start.y; // Same height
-
-      // Create curved bezier path
-      const midZ = (start.z + end.z) / 2;
-      const curve = new THREE.QuadraticBezierCurve3(
-        start,
-        new THREE.Vector3(start.x, start.y + 10, midZ),
-        end
-      );
-
-      const points = curve.getPoints(20);
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({
-        color: CONFIG.colors.gridAccent,
-        transparent: true,
-        opacity: 0.75
-      });
-
-      const line = new THREE.Line(geometry, material);
-      connectionLines.add(line);
-    }
-  }
 }
 
 function handleNodeDoubleClick(nodeId) {
