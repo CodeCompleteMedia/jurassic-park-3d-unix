@@ -697,35 +697,39 @@ function showCurrentFolder() {
   // Redraw folder connections for visible folders
   drawFolderConnections();
 
-  // Show/hide platforms: previous row + current + next 4 rows
-  // This allows users to see at least 5 rows ahead
+  // Build set of folders to always show: current folder + all in navigation history + next 2 rows
+  const foldersToShow = new Set(state.navigationHistory);
+  const maxDepthInHistory = Math.max(...state.navigationHistory.map(id => FOLDER_GRAPH[id].depth));
+
+  // Add next 2 rows of folders from current position
+  Object.values(FOLDER_GRAPH).forEach(folder => {
+    if (folder.depth > depthIndex && folder.depth <= depthIndex + 2) {
+      foldersToShow.add(folder.id);
+    }
+  });
+
+  // Show/hide platforms: current + history + next 2 rows
   platformMeshes.forEach((mesh, folderId) => {
-    const f = FOLDER_GRAPH[folderId];
-    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 4;
+    mesh.visible = foldersToShow.has(folderId);
   });
 
   // Show/hide floor labels with platforms
   folderLabels.forEach((label, folderId) => {
-    const f = FOLDER_GRAPH[folderId];
-    label.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 4;
+    label.visible = foldersToShow.has(folderId);
   });
 
-  // Show/hide nodes for current depth through next 4 depths
+  // Show/hide nodes for visible folders
   nodeMeshes.forEach(({ mesh, label }, nodeId) => {
     const nodeFolderId = mesh.userData.folderId;
-    const nodeFolder = FOLDER_GRAPH[nodeFolderId];
-    const isVisibleDepth = nodeFolder.depth >= depthIndex && nodeFolder.depth <= depthIndex + 4;
-
-    // Show nodes for visible depths
-    mesh.visible = isVisibleDepth;
+    mesh.visible = foldersToShow.has(nodeFolderId);
 
     // Reset material opacity and transparency
     mesh.material.opacity = 1;
     mesh.material.transparent = false;
 
-    // Show labels for visible depths
+    // Show labels for visible folders
     if (label) {
-      label.visible = isVisibleDepth;
+      label.visible = foldersToShow.has(nodeFolderId);
       label.material.opacity = 1;
     }
   });
