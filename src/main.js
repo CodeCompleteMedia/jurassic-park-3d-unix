@@ -601,41 +601,45 @@ function drawFolderConnections() {
     connectionLines.remove(connectionLines.children[0]);
   }
 
-  // Count connections found
-  let connectionCount = 0;
+  // Calculate entry/exit points for each folder
+  const folderPoints = {};
 
-  // Draw bezier curve from each folder's nodes to their destinations
   Object.values(FOLDER_GRAPH).forEach(folder => {
-    const fromPlatform = platformMeshes.get(folder.id);
-    if (!fromPlatform) return;
+    const platform = platformMeshes.get(folder.id);
+    if (!platform) return;
+
+    // Exit point - front of folder
+    folderPoints[folder.id] = {
+      exit: new THREE.Vector3(
+        platform.position.x,
+        0.2,
+        platform.position.z + platform.userData.depth / 2 + 2
+      ),
+      // Entry point - back of folder
+      entry: new THREE.Vector3(
+        platform.position.x,
+        0.2,
+        platform.position.z - platform.userData.depth / 2 - 2
+      )
+    };
+  });
+
+  // Draw bezier curve for each node connection
+  Object.values(FOLDER_GRAPH).forEach(folder => {
+    const exitPoint = folderPoints[folder.id]?.exit;
+    if (!exitPoint) return;
 
     folder.nodes.forEach(node => {
       if (node.nextFolderId) {
-        const toPlatform = platformMeshes.get(node.nextFolderId);
-        if (!toPlatform) return;
+        const entryPoint = folderPoints[node.nextFolderId]?.entry;
+        if (!entryPoint) return;
 
-        connectionCount++;
-
-        // Start from front edge of current folder at floor level
-        const start = new THREE.Vector3(
-          fromPlatform.position.x,
-          0.2,
-          fromPlatform.position.z + fromPlatform.userData.depth / 2 + 2
-        );
-
-        // End at front edge of next folder at floor level
-        const end = new THREE.Vector3(
-          toPlatform.position.x,
-          0.2,
-          toPlatform.position.z + toPlatform.userData.depth / 2 + 2
-        );
-
-        // Create curved bezier path at floor level
-        const midZ = (start.z + end.z) / 2;
+        // Create curved bezier path from exit to entry
+        const midZ = (exitPoint.z + entryPoint.z) / 2;
         const curve = new THREE.QuadraticBezierCurve3(
-          start,
-          new THREE.Vector3(start.x, 0.2, midZ),
-          end
+          exitPoint,
+          new THREE.Vector3(exitPoint.x, 0.2, midZ),
+          entryPoint
         );
 
         const points = curve.getPoints(30);
@@ -651,8 +655,6 @@ function drawFolderConnections() {
       }
     });
   });
-
-  console.log('Folder connections drawn:', connectionCount);
 }
 
 // Only update visibility - don't redraw
