@@ -1245,28 +1245,29 @@ function animate() {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(raycastTargets);
 
-    // Reset previous hover
-    if (state.hoveredNodeId) {
-      const prevHover = nodeMeshes.get(state.hoveredNodeId);
-      if (prevHover && prevHover.mesh.userData.nodeId !== state.selectedNodeId) {
-        prevHover.mesh.position.y = calculateNodeY(prevHover.mesh.userData.folderId);
-        prevHover.mesh.scale.set(1, 1, 1);
+    const hoveredNodeId = intersects.length > 0 ? intersects[0].object.userData.nodeId : null;
+
+    // Only process changes when hover state actually changes
+    if (hoveredNodeId !== state.hoveredNodeId) {
+      // Reset previous hover
+      if (state.hoveredNodeId) {
+        const prevHover = nodeMeshes.get(state.hoveredNodeId);
+        if (prevHover && prevHover.mesh.userData.nodeId !== state.selectedNodeId) {
+          prevHover.mesh.position.y = calculateNodeY(prevHover.mesh.userData.folderId);
+          prevHover.mesh.scale.set(1, 1, 1);
+        }
+        if (prevHover && prevHover.label) {
+          prevHover.label.material.opacity = 0;
+        }
       }
-      if (prevHover && prevHover.label) {
-        prevHover.label.material.opacity = 0;
-      }
-    }
 
-    haloMesh.material.opacity = 0;
+      haloMesh.material.opacity = 0;
 
-    if (intersects.length > 0) {
-      const target = intersects[0].object;
-      const nodeId = target.userData.nodeId;
+      // Set new hover
+      if (hoveredNodeId) {
+        state.hoveredNodeId = hoveredNodeId;
 
-      if (nodeId !== state.hoveredNodeId) {
-        state.hoveredNodeId = nodeId;
-
-        const nodeData = nodeMeshes.get(nodeId);
+        const nodeData = nodeMeshes.get(hoveredNodeId);
         if (nodeData) {
           // Raise node
           const baseY = calculateNodeY(nodeData.mesh.userData.folderId);
@@ -1283,9 +1284,9 @@ function animate() {
           haloMesh.position.z = nodeData.mesh.position.z;
           haloMesh.material.opacity = 0.15;
         }
+      } else {
+        state.hoveredNodeId = null;
       }
-    } else {
-      state.hoveredNodeId = null;
     }
   }
 
