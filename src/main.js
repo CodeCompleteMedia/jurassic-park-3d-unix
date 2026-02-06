@@ -871,6 +871,21 @@ function setupEventListeners() {
   // Start clock
   updateClock();
   setInterval(updateClock, 1000);
+
+  // Listen for X Window resize events
+  const windowEl = document.getElementById('xterm-window');
+  if (windowEl) {
+    windowEl.addEventListener('windowresize', () => {
+      const container = document.getElementById('canvas-container');
+      if (container && renderer) {
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      }
+    });
+  }
 }
 
 // Update CDE-style clock

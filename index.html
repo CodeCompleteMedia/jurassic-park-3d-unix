@@ -75,8 +75,43 @@
         2px 2px 0 #2a2a2a,
         inset 1px 1px 0 #5a5a5a,
         0 10px 30px rgba(0,0,0,0.4);
-      min-width: 900px;
-      max-width: 95vw;
+      min-width: 600px;
+      min-height: 400px;
+    }
+
+    /* Resize handle */
+    #window-resize-handle {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      height: 16px;
+      cursor: se-resize;
+      z-index: 10;
+    }
+
+    #window-resize-handle::before {
+      content: '';
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 8px;
+      height: 8px;
+      background:
+        linear-gradient(135deg, transparent 50%, #7a7a7a 50%, #7a7a7a 60%, transparent 60%),
+        linear-gradient(135deg, transparent 65%, #7a7a7a 65%, #7a7a7a 75%, transparent 75%);
+    }
+
+    #window-resize-handle::after {
+      content: '';
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid #7a7a7a;
+      border-bottom: 2px solid #7a7a7a;
+      opacity: 0.5;
     }
 
     /* X Window Title Bar */
@@ -774,6 +809,8 @@
         <div id="status-line">SELECT NODE</div>
       </div>
     </div>
+    <!-- Resize handle -->
+    <div id="window-resize-handle"></div>
   </div>
 
   <!-- CRT Scanlines -->
@@ -864,15 +901,23 @@
     </div>
   </div>
 
-  <!-- Window Dragging -->
+  <!-- Window Dragging and Resizing -->
   <script>
     (function() {
       const windowEl = document.getElementById('xterm-window');
       const titlebar = document.getElementById('window-titlebar');
+      const resizeHandle = document.getElementById('window-resize-handle');
+      const contentArea = document.querySelector('.x-content');
       let isDragging = false;
+      let isResizing = false;
       let dragOffsetX = 0;
       let dragOffsetY = 0;
+      let resizeStartX = 0;
+      let resizeStartY = 0;
+      let resizeStartWidth = 0;
+      let resizeStartHeight = 0;
 
+      // Drag functionality
       titlebar.addEventListener('mousedown', (e) => {
         if (e.target.closest('.x-controls')) return; // Don't drag when clicking buttons
         isDragging = true;
@@ -885,13 +930,35 @@
       });
 
       document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        windowEl.style.left = (e.clientX - dragOffsetX) + 'px';
-        windowEl.style.top = (e.clientY - dragOffsetY) + 'px';
+        if (isDragging) {
+          windowEl.style.left = (e.clientX - dragOffsetX) + 'px';
+          windowEl.style.top = (e.clientY - dragOffsetY) + 'px';
+        }
+        if (isResizing) {
+          const newWidth = resizeStartWidth + (e.clientX - resizeStartX);
+          const newHeight = resizeStartHeight + (e.clientY - resizeStartY);
+          windowEl.style.width = Math.max(600, newWidth) + 'px';
+          windowEl.style.height = Math.max(400, newHeight) + 'px';
+          windowEl.dispatchEvent(new CustomEvent('windowresize'));
+        }
       });
 
       document.addEventListener('mouseup', () => {
         isDragging = false;
+        isResizing = false;
+      });
+
+      // Resize functionality
+      resizeHandle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isResizing = true;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        resizeStartWidth = windowEl.offsetWidth;
+        resizeStartHeight = windowEl.offsetHeight;
+        windowEl.style.transform = 'none';
+        windowEl.style.left = windowEl.offsetLeft + 'px';
+        windowEl.style.top = windowEl.offsetTop + 'px';
       });
     })();
   </script>
