@@ -614,7 +614,7 @@ function drawFolderConnections() {
     });
   });
 
-  // Draw bezier curve from each connected folder
+  // Draw bezier curve from each connected folder at floor level
   Object.keys(folderConnections).forEach(fromFolderId => {
     const toFolderIds = folderConnections[fromFolderId];
     const fromPlatform = platformMeshes.get(fromFolderId);
@@ -625,19 +625,25 @@ function drawFolderConnections() {
       const toPlatform = platformMeshes.get(toFolderId);
       if (!toPlatform) return;
 
-      // Start from front edge of current folder
-      const start = fromPlatform.position.clone();
-      start.z += fromPlatform.userData.depth / 2 + 2;
+      // Start from front edge of current folder at floor level
+      const start = new THREE.Vector3(
+        fromPlatform.position.x,
+        0.1,
+        fromPlatform.position.z + fromPlatform.userData.depth / 2 + 1
+      );
 
-      // End at front edge of next folder
-      const end = toPlatform.position.clone();
-      end.z += toPlatform.userData.depth / 2 + 2;
+      // End at front edge of next folder at floor level
+      const end = new THREE.Vector3(
+        toPlatform.position.x,
+        0.1,
+        toPlatform.position.z + toPlatform.userData.depth / 2 + 1
+      );
 
-      // Create curved bezier path
+      // Create curved bezier path at floor level
       const midZ = (start.z + end.z) / 2;
       const curve = new THREE.QuadraticBezierCurve3(
         start,
-        new THREE.Vector3(start.x, start.y + 15, midZ),
+        new THREE.Vector3(start.x, 0.1, midZ),
         end
       );
 
