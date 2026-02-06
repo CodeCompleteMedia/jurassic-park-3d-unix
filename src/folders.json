@@ -5,8 +5,8 @@
     "depth": 0,
     "nodes": [
       { "id": "readme_access", "label": "README_ACCESS", "type": "clue", "clueId": "readme_access", "icon": "paper", "enterable": false },
-      { "id": "terminal_access", "label": "SECURITY", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock", "terminalId": "auth_main" },
-      { "id": "terminal_fake1", "label": "ADMIN", "type": "terminal", "enterable": false, "nextFolderId": "trash_empty", "icon": "lock", "terminalId": "auth_fake" },
+      { "id": "terminal_access", "label": "SECURITY", "type": "terminal", "enterable": false, "nextFolderId": "trash_empty", "icon": "lock", "terminalId": "auth_main" },
+      { "id": "terminal_fake1", "label": "ADMIN", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock", "terminalId": "auth_fake" },
       { "id": "terminal_fake2", "label": "ROOT", "type": "terminal", "enterable": false, "nextFolderId": "var_locked", "icon": "lock", "terminalId": "auth_fake" },
       { "id": "usr_ingn_memo", "label": "ops_memo", "type": "clue", "clueId": "usr_ingn_memo", "icon": "paper", "enterable": false },
       { "id": "paddock_status_log", "label": "paddock", "type": "clue", "clueId": "paddock_status_log", "icon": "paper", "enterable": false },
@@ -63,27 +63,16 @@
     ]
   },
 
-  "sys_core": {
-    "id": "sys_core",
-    "name": "/sys",
+  "trash_empty": {
+    "id": "trash_empty",
+    "name": "/tmp/trash",
     "depth": 1,
     "nodes": [
-      { "id": "kernel", "label": "kernel", "type": "folderGate", "enterable": true, "nextFolderId": "park_ops", "icon": "lock" },
-      { "id": "config_cf", "label": "config", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Kernel configuration. Modified by unauthorized user." },
-      { "id": "modules", "label": "modules", "type": "folderGate", "enterable": true, "nextFolderId": "modules_test", "icon": "chip" },
-      { "id": "dev_null", "label": "null", "type": "redHerring", "enterable": false, "icon": "warning" },
-      { "id": "proc_stat", "label": "stat", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "mem_info", "label": "memory", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Memory usage: Security daemon consuming 94% of resources." },
-      { "id": "fs_root", "label": "fs", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
-      { "id": "net_route", "label": "routes", "type": "folderGate", "enterable": true, "nextFolderId": "net_sandbox", "icon": "chip" },
-      { "id": "syslog", "label": "syslog", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Warning: Unscheduled door overrides detected at multiple enclosures." },
-      { "id": "boot_grub", "label": "boot", "type": "folderGate", "enterable": true, "nextFolderId": "boot_rescue", "icon": "paper" },
-
-      { "id": "sys_watchdog", "label": "watchdog", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "System watchdog notes repeated restarts after power dips." },
-      { "id": "sys_crypt", "label": "crypt", "type": "dead", "enterable": false, "icon": "lock", "parentName": "sys" },
-      { "id": "sys_rbac", "label": "rbac", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "Role mappings include 'contractor' with unexpected elevated scope." },
-      { "id": "sys_patchlvl", "label": "patchlevel", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "sys" },
-      { "id": "sys_failover", "label": "failover", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "sys" }
+      { "id": "trash_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files. This folder has been cleared." },
+      { "id": "trash_deleted", "label": "DELETED", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_old", "label": "old_cache", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "trash_crash", "label": "crash_dump", "type": "dead", "enterable": false, "icon": "warning" },
+      { "id": "trash_info", "label": "INFO", "type": "lore", "enterable": false, "icon": "paper", "loreText": "This temporary directory has been purged. No recoverable data." }
     ]
   },
 
@@ -363,16 +352,27 @@
     ]
   },
 
-  "trash_empty": {
-    "id": "trash_empty",
-    "name": "/tmp/trash",
+  "sys_core": {
+    "id": "sys_core",
+    "name": "/sys",
     "depth": 1,
     "nodes": [
-      { "id": "trash_index", "label": "INDEX", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Temporary files. This folder has been cleared." },
-      { "id": "trash_deleted", "label": "DELETED", "type": "dead", "enterable": false, "icon": "warning" },
-      { "id": "trash_old", "label": "old_cache", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "trash_crash", "label": "crash_dump", "type": "dead", "enterable": false, "icon": "warning" },
-      { "id": "trash_info", "label": "INFO", "type": "lore", "enterable": false, "icon": "paper", "loreText": "This temporary directory has been purged. No recoverable data." }
+      { "id": "kernel", "label": "kernel", "type": "folderGate", "enterable": true, "nextFolderId": "park_ops", "icon": "lock" },
+      { "id": "config_cf", "label": "config", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Kernel configuration. Modified by unauthorized user." },
+      { "id": "modules", "label": "modules", "type": "folderGate", "enterable": true, "nextFolderId": "modules_test", "icon": "chip" },
+      { "id": "dev_null", "label": "null", "type": "redHerring", "enterable": false, "icon": "warning" },
+      { "id": "proc_stat", "label": "stat", "type": "dead", "enterable": false, "icon": "paper" },
+      { "id": "mem_info", "label": "memory", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Memory usage: Security daemon consuming 94% of resources." },
+      { "id": "fs_root", "label": "fs", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
+      { "id": "net_route", "label": "routes", "type": "folderGate", "enterable": true, "nextFolderId": "net_sandbox", "icon": "chip" },
+      { "id": "syslog", "label": "syslog", "type": "lore", "enterable": false, "icon": "paper", "loreText": "Warning: Unscheduled door overrides detected at multiple enclosures." },
+      { "id": "boot_grub", "label": "boot", "type": "folderGate", "enterable": true, "nextFolderId": "boot_rescue", "icon": "paper" },
+
+      { "id": "sys_watchdog", "label": "watchdog", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "System watchdog notes repeated restarts after power dips." },
+      { "id": "sys_crypt", "label": "crypt", "type": "dead", "enterable": false, "icon": "lock", "parentName": "sys" },
+      { "id": "sys_rbac", "label": "rbac", "type": "lore", "enterable": false, "icon": "paper", "parentName": "sys", "loreText": "Role mappings include 'contractor' with unexpected elevated scope." },
+      { "id": "sys_patchlvl", "label": "patchlevel", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "sys" },
+      { "id": "sys_failover", "label": "failover", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "sys" }
     ]
   },
 

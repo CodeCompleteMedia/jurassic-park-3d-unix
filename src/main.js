@@ -342,8 +342,17 @@ function calculateFolderPositions() {
       }
     });
 
-    // Position folders centered around x=0
-    let currentX = -totalWidth / 2;
+    // Position folders
+    let startX;
+    if (depth === '1') {
+      // Depth 1 folders start from left edge
+      startX = -300;
+    } else {
+      // Other depths centered around x=0
+      startX = -totalWidth / 2;
+    }
+
+    let currentX = startX;
     folders.forEach((folder, index) => {
       const halfWidth = folderWidths[folder.id] / 2;
       positions[folder.id] = currentX + halfWidth;
