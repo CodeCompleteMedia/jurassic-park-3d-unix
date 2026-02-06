@@ -21,7 +21,7 @@ const CONFIG = {
   },
   depth: {
     levels: 6,
-    step: 26,
+    step: 75,
     startZ: 0
   },
   platform: {
