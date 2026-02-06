@@ -985,30 +985,35 @@ function showConnections(fromNodeId) {
 
   const nodeData = fromNode.mesh.userData.nodeData;
 
-  // Find children in next folder
+  // Draw single bezier curve to next folder
   if (nodeData.nextFolderId) {
     const nextFolder = FOLDER_GRAPH[nodeData.nextFolderId];
+    const nextFolderPlatform = platformMeshes.get(nodeData.nextFolderId);
 
-    nodeMeshes.forEach(({ mesh }, nodeId) => {
-      if (mesh.userData.folderId === nextFolder.id) {
-        const toMesh = mesh;
+    if (nextFolderPlatform) {
+      const start = fromNode.mesh.position.clone();
+      const end = nextFolderPlatform.position.clone();
+      end.y = start.y; // Same height
 
-        const points = [
-          fromNode.mesh.position.clone(),
-          toMesh.position.clone()
-        ];
+      // Create curved bezier path
+      const midZ = (start.z + end.z) / 2;
+      const curve = new THREE.QuadraticBezierCurve3(
+        start,
+        new THREE.Vector3(start.x, start.y + 10, midZ),
+        end
+      );
 
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({
-          color: CONFIG.colors.gridAccent,
-          transparent: true,
-          opacity: 0.75
-        });
+      const points = curve.getPoints(20);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({
+        color: CONFIG.colors.gridAccent,
+        transparent: true,
+        opacity: 0.75
+      });
 
-        const line = new THREE.Line(geometry, material);
-        connectionLines.add(line);
-      }
-    });
+      const line = new THREE.Line(geometry, material);
+      connectionLines.add(line);
+    }
   }
 }
 
