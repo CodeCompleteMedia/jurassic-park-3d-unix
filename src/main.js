@@ -21,7 +21,7 @@ const CONFIG = {
   },
   depth: {
     levels: 6,
-    step: 75,
+    step: 45,
     startZ: 0
   },
   platform: {
@@ -312,7 +312,7 @@ function calculateFolderPositions() {
   });
 
   // Calculate X positions with 75 units edge-to-edge
-  const edgeGap = 75;
+  const edgeGap = 55;
 
   Object.keys(depthFolders).forEach(depth => {
     const folders = depthFolders[depth];
