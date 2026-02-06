@@ -153,16 +153,7 @@ async function init() {
   // Initialize folder view
   showCurrentFolder();
 
-  // Hide loading
-  setTimeout(() => {
-    document.getElementById('loading').classList.add('hidden');
-  }, 1000);
-
-  // Animation loop
-  animate();
-}
-
-function setupLighting() {
+  // Halo
   createHalo();
 
   // Event listeners
