@@ -597,28 +597,27 @@ function showCurrentFolder() {
   // Set camera to look at this folder
   setCameraToFolder(state.currentFolderId, false);
 
-  // Show/hide platforms: previous row + current + next 2 rows
-  // This allows users to see at least 3 rows ahead
+  // Show/hide platforms: previous row + current + next 4 rows
+  // This allows users to see at least 5 rows ahead
   platformMeshes.forEach((mesh, folderId) => {
     const f = FOLDER_GRAPH[folderId];
-    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
+    mesh.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 4;
   });
 
   // Show/hide floor labels with platforms
   folderLabels.forEach((label, folderId) => {
     const f = FOLDER_GRAPH[folderId];
-    label.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 2;
+    label.visible = f.depth >= depthIndex - 1 && f.depth <= depthIndex + 4;
   });
 
-  // Show/hide nodes for current depth and next depth (no text on distant nodes)
+  // Show/hide nodes for current depth through next 4 depths
   nodeMeshes.forEach(({ mesh, label }, nodeId) => {
     const nodeFolderId = mesh.userData.folderId;
     const nodeFolder = FOLDER_GRAPH[nodeFolderId];
-    const isCurrentDepth = nodeFolder.depth === depthIndex;
-    const isNextDepth = nodeFolder.depth === depthIndex + 1;
+    const isVisibleDepth = nodeFolder.depth >= depthIndex && nodeFolder.depth <= depthIndex + 4;
 
-    // Show nodes for current and next depth
-    mesh.visible = isCurrentDepth || isNextDepth;
+    // Show nodes for visible depths
+    mesh.visible = isVisibleDepth;
 
     // Reset material opacity and transparency
     mesh.material.opacity = 1;
