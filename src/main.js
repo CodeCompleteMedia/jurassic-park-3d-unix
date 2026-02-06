@@ -608,14 +608,14 @@ function drawFolderConnections() {
     const platform = platformMeshes.get(folder.id);
     if (!platform) return;
 
-    // Exit point - front of folder
+    // Exit point - back of folder (negative Z)
     folderPoints[folder.id] = {
       exit: new THREE.Vector3(
         platform.position.x,
         0.2,
-        platform.position.z + platform.userData.depth / 2 + 2
+        platform.position.z - platform.userData.depth / 2 - 2
       ),
-      // Entry point - back of folder
+      // Entry point - back of folder (for joining)
       entry: new THREE.Vector3(
         platform.position.x,
         0.2,
@@ -624,25 +624,37 @@ function drawFolderConnections() {
     };
   });
 
-  // Draw bezier curve for each node connection
+  // Draw curve for each node connection
   Object.values(FOLDER_GRAPH).forEach(folder => {
-    const exitPoint = folderPoints[folder.id]?.exit;
-    if (!exitPoint) return;
+    const startPoint = folderPoints[folder.id]?.exit;
+    if (!startPoint) return;
 
     folder.nodes.forEach(node => {
       if (node.nextFolderId) {
-        const entryPoint = folderPoints[node.nextFolderId]?.entry;
-        if (!entryPoint) return;
+        const endPoint = folderPoints[node.nextFolderId]?.entry;
+        if (!endPoint) return;
 
-        // Create curved bezier path from exit to entry
-        const midZ = (exitPoint.z + entryPoint.z) / 2;
-        const curve = new THREE.QuadraticBezierCurve3(
-          exitPoint,
-          new THREE.Vector3(exitPoint.x, 0.2, midZ),
-          entryPoint
+        // Create cubic bezier: straight first, then soft +/-35 degree curve
+        // P0 = start (back of folder)
+        // P1 = go straight for a bit (negative Z)
+        // P2 = curve at 35 degrees toward destination X
+        // P3 = end (back of destination folder)
+
+        const straightDist = 15; // How far to go straight before curving
+        const curveStrength = Math.abs(endPoint.x - startPoint.x) * 0.35; // 35 degree angle
+
+        const p0 = startPoint.clone();
+        const p1 = new THREE.Vector3(startPoint.x, 0.2, startPoint.z - straightDist);
+        const p2 = new THREE.Vector3(
+          startPoint.x + (endPoint.x > startPoint.x ? curveStrength : -curveStrength),
+          0.2,
+          endPoint.z + straightDist / 2
         );
+        const p3 = endPoint.clone();
 
+        const curve = new THREE.CubicBezierCurve3(p0, p1, p2, p3);
         const points = curve.getPoints(30);
+
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
           color: CONFIG.colors.gridAccent,
