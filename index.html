@@ -733,10 +733,10 @@
 
   <!-- Main X Window -->
   <div id="xterm-window">
-    <div class="x-titlebar inactive">
+    <div class="x-titlebar inactive" id="window-titlebar">
       <div class="x-title">
         <div class="x-icon">fm</div>
-        File Manager - /usr
+        <span id="window-title-text">File Manager - /usr</span>
       </div>
       <div class="x-controls">
         <button class="x-btn" title="Minimize">_</button>
@@ -863,6 +863,38 @@
       <div class="clue-content" id="clue-text"></div>
     </div>
   </div>
+
+  <!-- Window Dragging -->
+  <script>
+    (function() {
+      const windowEl = document.getElementById('xterm-window');
+      const titlebar = document.getElementById('window-titlebar');
+      let isDragging = false;
+      let dragOffsetX = 0;
+      let dragOffsetY = 0;
+
+      titlebar.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.x-controls')) return; // Don't drag when clicking buttons
+        isDragging = true;
+        const rect = windowEl.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        windowEl.style.transform = 'none';
+        windowEl.style.left = rect.left + 'px';
+        windowEl.style.top = rect.top + 'px';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        windowEl.style.left = (e.clientX - dragOffsetX) + 'px';
+        windowEl.style.top = (e.clientY - dragOffsetY) + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+    })();
+  </script>
 
   <script type="module" src="/src/main.js"></script>
 </body>

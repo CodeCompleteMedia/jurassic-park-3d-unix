@@ -128,11 +128,12 @@ async function init() {
   camera.lookAt(state.currentLookAt);
 
   // Renderer
+  const container = document.getElementById('canvas-container');
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = false;
-  document.getElementById('canvas-container').appendChild(renderer.domElement);
+  container.appendChild(renderer.domElement);
 
   // Raycaster
   raycaster = new THREE.Raycaster();
@@ -885,19 +886,31 @@ function updateClock() {
   }
 }
 
+function getMouseFromEvent(event) {
+  const canvas = renderer.domElement;
+  const rect = canvas.getBoundingClientRect();
+  const mouseCoords = new THREE.Vector2();
+  mouseCoords.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseCoords.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  return mouseCoords;
+}
+
 function onMouseMove(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  const mouseCoords = getMouseFromEvent(event);
+  mouse.x = mouseCoords.x;
+  mouse.y = mouseCoords.y;
 }
 
 function onClick(event) {
+  const clickMouse = getMouseFromEvent(event);
+
   const now = Date.now();
   const isDoubleClick = now - state.lastClickTime < 300;
   state.lastClickTime = now;
 
   if (state.isTransitioning || state.isWon) return;
 
-  raycaster.setFromCamera(mouse, camera);
+  raycaster.setFromCamera(clickMouse, camera);
   const intersects = raycaster.intersectObjects(raycastTargets);
 
   if (intersects.length > 0) {
@@ -984,9 +997,12 @@ function onMouseDown(event) {
 }
 
 function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const container = document.getElementById('canvas-container');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(width, height);
 }
 
 function onKeyDown(event) {
@@ -1236,7 +1252,21 @@ function handleNodeDoubleClick(nodeId) {
 
 function enterFolder(folderId, addToHistory = true) {
   state.isTransitioning = true;
+  state.currentFolderId = folderId;
   document.getElementById('status-line').textContent = 'ACCESSING...';
+
+  // Update window title
+  const folder = FOLDER_GRAPH[folderId];
+  if (folder) {
+    const titleEl = document.getElementById('window-title-text');
+    if (titleEl) {
+      titleEl.textContent = `File Manager - ${folder.name}`;
+    }
+    const pathEl = document.querySelector('.x-path');
+    if (pathEl) {
+      pathEl.textContent = folder.name;
+    }
+  }
 
   // Add to navigation history if this is forward navigation
   if (addToHistory) {
