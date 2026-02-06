@@ -63,6 +63,9 @@ const state = {
   // Navigation history: array of folder IDs from root to current
   navigationHistory: ['root_usr'],
 
+  // Puzzle state tracking
+  puzzlesSolved: {}, // { folderId: { puzzleId: true } }
+
   // Camera state
   cameraMode: 'folder', // 'folder' | 'node'
   targetLookAt: new THREE.Vector3(0, 0, 0), // What the camera is looking at
@@ -446,6 +449,15 @@ function createFloorLabel(folder, xPos, zPos, platformDepth) {
   folderLabels.set(folder.id, plane);
 }
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 function createNodes(folder) {
   const depthIndex = folder.depth;
   const platform = platformMeshes.get(folder.id);
@@ -454,7 +466,8 @@ function createNodes(folder) {
   // Calculate platform top Y
   const platformTopY = CONFIG.platform.height / 2 + CONFIG.node.size.h / 2 + 0.1;
 
-  const nodes = folder.nodes;
+  // Shuffle nodes for random order (create a copy to avoid modifying original)
+  const nodes = shuffleArray([...folder.nodes]);
   const nodeWidth = CONFIG.node.size.w * scale;
   const nodeDepth = CONFIG.node.size.d * scale;
   const actualGap = gap * scale;
@@ -1094,6 +1107,16 @@ function handleNodeClick(nodeId) {
   const node = nodeData.mesh.userData.nodeData;
   if (node.type === 'lore') {
     document.getElementById('status-line').textContent = 'PRESS FOR DATA';
+  } else if (node.type === 'terminal') {
+    // Check if puzzle already solved
+    const puzzleId = node.puzzleId || 'root_auth';
+    if (isPuzzleSolved(state.currentFolderId, puzzleId)) {
+      document.getElementById('status-line').textContent = 'ACCESS GRANTED - DOUBLE CLICK TO ENTER';
+    } else {
+      document.getElementById('status-line').textContent = 'AUTH REQUIRED - DOUBLE CLICK TO ENTER';
+    }
+  } else if (node.type === 'clue') {
+    document.getElementById('status-line').textContent = 'PRESS FOR DATA';
   } else if (node.enterable) {
     document.getElementById('status-line').textContent = 'DOUBLE CLICK TO ENTER';
   } else if (node.type === 'trap') {
@@ -1115,6 +1138,25 @@ function handleNodeDoubleClick(nodeId) {
 
   if (node.type === 'lore') {
     showLore(node.loreText);
+    return;
+  }
+
+  if (node.type === 'clue') {
+    showClue(node.clueId);
+    return;
+  }
+
+  if (node.type === 'terminal') {
+    // Check if puzzle already solved - if so, just enter the folder
+    const puzzleId = node.puzzleId || 'root_auth';
+    if (isPuzzleSolved(state.currentFolderId, puzzleId)) {
+      // Already solved - just navigate
+      if (node.nextFolderId) {
+        enterFolder(node.nextFolderId);
+      }
+    } else {
+      showTerminal();
+    }
     return;
   }
 
@@ -1420,6 +1462,288 @@ function calculateNodeY(folderId) {
 
 function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+// ============================================
+// PUZZLE SYSTEM
+// ============================================
+
+// Puzzle definitions
+const PUZZLES = {
+  'root_auth': {
+    id: 'root_auth',
+    name: 'Terminal Access',
+    password: 'INGEN-PADDOCK10-MULDOON-1993',
+    format: 'PROJECT-SECTOR-KEYWORD-NUMBER (UPPERCASE, hyphens, no spaces)',
+    hint: 'Search the /usr directory for clues. Find all 4 parts.',
+    clues: {
+      project: { found: false, nodeId: 'usr_ingn_memo' },
+      sector: { found: false, nodeId: 'paddock_status_log' },
+      keyword: { found: false, nodeId: 'incident_report' },
+      number: { found: false, nodeId: 'badge_access' }
+    }
+  }
+};
+
+// Node click handlers for puzzle nodes
+function handlePuzzleNodeClick(nodeId, nodeType) {
+  if (nodeType === 'terminal') {
+    showTerminal();
+  } else if (nodeType === 'clue') {
+    showClue(nodeId);
+  }
+}
+
+// Show terminal UI
+function showTerminal() {
+  const overlay = document.getElementById('terminal-overlay');
+  const input = document.getElementById('terminal-input');
+  const feedback = document.getElementById('terminal-feedback');
+
+  // Reset state
+  input.value = '';
+  feedback.className = '';
+  feedback.innerHTML = '';
+  feedback.style.display = 'none';
+
+  // Update password part indicators based on found clues
+  const puzzle = PUZZLES['root_auth'];
+  for (const [part, clue] of Object.entries(puzzle.clues)) {
+    const partEl = document.getElementById(`part-${part}`);
+    if (partEl && clue.found) {
+      partEl.classList.add('found');
+    }
+  }
+
+  overlay.classList.add('visible');
+
+  // Focus input
+  setTimeout(() => {
+    input.focus();
+    input.addEventListener('keydown', handleTerminalKeydown);
+  }, 100);
+}
+
+function handleTerminalKeydown(e) {
+  if (e.key === 'Enter') {
+    submitPassword();
+  } else if (e.key === 'Escape') {
+    closeTerminal();
+  }
+}
+
+// ESC key closes terminal modal even when input not focused
+document.addEventListener('keydown', (e) => {
+  // Close terminal on ESC
+  if (e.key === 'Escape') {
+    const terminalOverlay = document.getElementById('terminal-overlay');
+    if (terminalOverlay.classList.contains('visible')) {
+      closeTerminal();
+      return;
+    }
+  }
+
+  // Close clue panel on any key (except Tab)
+  const cluePanel = document.getElementById('clue-panel');
+  if (cluePanel.classList.contains('visible') && e.key !== 'Tab') {
+    closeClue();
+  }
+});
+
+function submitPassword() {
+  const input = document.getElementById('terminal-input');
+  const feedback = document.getElementById('terminal-feedback');
+  const password = input.value.trim().toUpperCase();
+  const puzzle = PUZZLES['root_auth'];
+
+  if (!password) {
+    feedback.className = 'visible warning';
+    feedback.innerHTML = 'AUTH FAIL: NO INPUT DETECTED';
+    return;
+  }
+
+  // Validate format
+  const parts = password.split('-');
+  if (parts.length !== 4) {
+    feedback.className = 'visible warning';
+    feedback.innerHTML = 'AUTH FAIL: INVALID FORMAT (EXPECTED 4 PARTS)';
+    return;
+  }
+
+  // Check each part
+  const partNames = ['PROJECT', 'SECTOR', 'KEYWORD', 'NUMBER'];
+  const correctParts = puzzle.password.split('-');
+  let allCorrect = true;
+
+  for (let i = 0; i < 4; i++) {
+    const partEl = document.getElementById(`part-${partNames[i].toLowerCase()}`);
+    if (parts[i] === correctParts[i]) {
+      partEl.className = 'password-part valid';
+    } else {
+      // Check if it's a valid word but wrong position
+      const validWords = ['INGEN', 'PADDOCK10', 'MULDOON', '1993'];
+      if (validWords.includes(parts[i])) {
+        partEl.className = 'password-part invalid';
+      } else {
+        partEl.className = 'password-part';
+      }
+      allCorrect = false;
+    }
+  }
+
+  if (allCorrect) {
+    feedback.className = 'visible success';
+    feedback.innerHTML = 'AUTH OK: ACCESS GRANTED<br>REDIRECTING...';
+
+    // Unlock and navigate
+    setTimeout(() => {
+      closeTerminal();
+      unlockPuzzle('root_auth');
+    }, 1500);
+  } else {
+    feedback.className = 'visible error';
+    feedback.innerHTML = 'AUTH FAILED: INVALID CREDENTIALS<br>HINT: Check your clue files for the correct parts.';
+  }
+}
+
+function closeTerminal() {
+  const overlay = document.getElementById('terminal-overlay');
+  const input = document.getElementById('terminal-input');
+  input.removeEventListener('keydown', handleTerminalKeydown);
+  overlay.classList.remove('visible');
+}
+
+function unlockPuzzle(puzzleId) {
+  const puzzle = PUZZLES[puzzleId];
+  if (!puzzle) return;
+
+  // Track solved puzzle
+  if (!state.puzzlesSolved[state.currentFolderId]) {
+    state.puzzlesSolved[state.currentFolderId] = {};
+  }
+  state.puzzlesSolved[state.currentFolderId][puzzleId] = true;
+
+  // Find the gate node and enter the next folder
+  const folder = FOLDER_GRAPH[state.currentFolderId];
+  const gateNode = folder.nodes.find(n => n.type === 'terminal' && n.nextFolderId);
+
+  if (gateNode && gateNode.nextFolderId) {
+    enterFolder(gateNode.nextFolderId);
+  }
+}
+
+function showClue(nodeId) {
+  const panel = document.getElementById('clue-panel');
+  const title = document.getElementById('clue-title');
+  const content = document.getElementById('clue-text');
+
+  const clueTexts = {
+    'usr_ingn_memo': {
+      title: 'ops_memo.txt',
+      text: `InGen Operations
+-----------
+To: All Staff
+From: Admin
+Date: 1993
+
+ATTENTION: All procurement requests must reference the main PROJECT code:
+
+>>> PROJECT: <span style="color: #ff6b6b; font-weight: bold; font-size: 1.2em;">INGEN</span> <<<
+
+Do not forget to include sector designation in all field documentation.
+
+--
+InGen Operations | Isla Nublar | Asset Control`
+    },
+    'paddock_status_log': {
+      title: 'paddock_status.log',
+      text: `PADDOCK STATUS LOG
+================
+Timestamp: 1993-06-15 14:32:01
+
+> SECTOR: <span style="color: #4ecdc4; font-weight: bold; font-size: 1.2em;">PADDOCK10</span>
+> STATUS: MONITORING
+> ANIMALS: 7
+> FENCE: ACTIVE
+
+Last maintenance: 1993-05-20
+Next inspection: 1993-07-01`
+    },
+    'incident_report': {
+      title: 'incident_report_06.txt',
+      text: `INCIDENT REPORT #06
+===============
+Date: 1993-06-15
+Reported by: R. Muldoon
+
+SUBJECT: Fence Power Anomaly
+
+Field staff report: Unexpected fence power drop in sector.
+Manual override required.
+
+NOTE: For any auth code questions, contact:
+
+>>> <span style="color: #ffe66d; font-weight: bold; font-size: 1.2em;">MULDOON</span> <<<
+
+Attachments: fence_diagram.pdf ( corrupted )`
+    },
+    'badge_access': {
+      title: 'badge_access.log',
+      text: `BADGE ACCESS LOG
+=============
+AUTH CODE: <span style="color: #a8e6cf; font-weight: bold; font-size: 1.2em;">1993</span>
+
+[ACCESS] 06:00 - Security Station
+[ACCESS] 08:15 - Main Control
+[ACCESS] 12:30 - Embryo Storage
+[ACCESS] 14:00 - Paddock 10 Entry
+
+NOTE: Auth codes reset quarterly. Current code valid until next audit.`
+    },
+    'readme_access': {
+      title: 'README_ACCESS.txt',
+      text: `PASSWORD FORMAT
+=============
+WARNING: This system requires authentication before
+accessing protected folders.
+
+Format: PROJECT-SECTOR-KEYWORD-NUMBER
+Rules:
+  - All UPPERCASE
+  - Use hyphens between parts
+  - NO SPACES
+  - Example: COMPANY-ZONE-NAME-1234
+
+Collect all 4 parts from files in this directory.
+Each part is hidden in a different file and highlighted in bold.`
+    }
+  };
+
+  const clue = clueTexts[nodeId];
+  if (clue) {
+    title.textContent = `[root@park:${clue.title}]`;
+    content.innerHTML = clue.text;
+    panel.classList.add('visible');
+
+    // Mark clue as found in puzzle state
+    const puzzle = PUZZLES['root_auth'];
+    for (const [part, clueData] of Object.entries(puzzle.clues)) {
+      if (clueData.nodeId === nodeId) {
+        clueData.found = true;
+        break;
+      }
+    }
+  }
+}
+
+function closeClue() {
+  const panel = document.getElementById('clue-panel');
+  panel.classList.remove('visible');
+}
+
+// Check if puzzle is solved
+function isPuzzleSolved(folderId, puzzleId) {
+  return state.puzzlesSolved[folderId]?.[puzzleId] === true;
 }
 
 // ============================================

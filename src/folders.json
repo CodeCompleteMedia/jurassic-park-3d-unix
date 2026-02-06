@@ -4,24 +4,18 @@
     "name": "/usr",
     "depth": 0,
     "nodes": [
-      { "id": "sys_bin", "label": "bin", "type": "folderGate", "enterable": true, "nextFolderId": "sys_core", "icon": "chip" },
-      { "id": "local_etc", "label": "etc", "type": "lore", "enterable": false, "icon": "paper", "loreText": "System configuration files. Most require root access." },
-      { "id": "share_doc", "label": "doc", "type": "folderGate", "enterable": true, "nextFolderId": "doc_archive", "icon": "paper" },
-      { "id": "include_h", "label": "include", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "sbin_init", "label": "init", "type": "redHerring", "enterable": false, "icon": "warning" },
-      { "id": "lib_core", "label": "lib", "type": "dead", "enterable": false, "icon": "paper" },
-      { "id": "tmp_cache", "label": "cache", "type": "trap", "enterable": false, "trapEffect": "scramble", "icon": "warning" },
-      { "id": "var_log", "label": "log", "type": "lore", "enterable": false, "icon": "paper", "loreText": "System logs. Notable entry: 'I told them this was a bad idea.' - D. Nedry" },
-      { "id": "src_code", "label": "src", "type": "folderGate", "enterable": true, "nextFolderId": "src_archive", "icon": "paper" },
-      { "id": "games", "label": "games", "type": "folderGate", "enterable": true, "nextFolderId": "games_archive", "icon": "paper" },
-
-      { "id": "usr_ingn", "label": "ingen", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "InGen internal memos. Includes procurement records for fencing, tranq supplies, and embryo transport." },
-      { "id": "usr_biofx", "label": "biofx", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "Bio-systems utilities. References Dr. Henry Wu lab workflows and batch incubation schedules." },
-      { "id": "usr_lysine", "label": "lysine", "type": "redHerring", "enterable": false, "icon": "warning", "parentName": "/usr" },
-      { "id": "usr_supply", "label": "supply", "type": "dead", "enterable": false, "icon": "paper", "parentName": "/usr" },
-      { "id": "usr_crashdump", "label": "crashdump", "type": "trap", "enterable": false, "trapEffect": "back", "icon": "warning", "parentName": "/usr" },
-      { "id": "usr_mr_arnold", "label": "arnold_notes", "type": "lore", "enterable": false, "icon": "paper", "parentName": "/usr", "loreText": "Ray Arnold terminal notes. Mentions recurring door override loops and delayed fence re-energize events." },
-      { "id": "usr_isla", "label": "isla_nublar", "type": "dead", "enterable": false, "icon": "paper", "parentName": "/usr" }
+      { "id": "readme_access", "label": "README_ACCESS", "type": "clue", "clueId": "readme_access", "icon": "paper", "enterable": false },
+      { "id": "terminal_access", "label": "TERMINAL", "type": "terminal", "enterable": false, "nextFolderId": "sys_core", "icon": "lock" },
+      { "id": "usr_ingn_memo", "label": "ops_memo", "type": "clue", "clueId": "usr_ingn_memo", "icon": "paper", "enterable": false },
+      { "id": "paddock_status_log", "label": "paddock", "type": "clue", "clueId": "paddock_status_log", "icon": "paper", "enterable": false },
+      { "id": "incident_report", "label": "incident", "type": "clue", "clueId": "incident_report", "icon": "paper", "enterable": false },
+      { "id": "badge_access", "label": "badge_log", "type": "clue", "clueId": "badge_access", "icon": "paper", "enterable": false },
+      { "id": "coffee_order", "label": "coffee", "type": "lore", "icon": "paper", "enterable": false, "loreText": "Coffee order from Dennis. 'Double shot, no sugar. The raptors are restless today.'" },
+      { "id": "broken_terminal", "label": "core_dump", "type": "dead", "icon": "warning", "enterable": false },
+      { "id": "old_paddock", "label": "old_log", "type": "lore", "icon": "paper", "enterable": false, "loreText": "PADDOCK05 status log. Sector not found. Wrong file." },
+      { "id": "visitor_map", "label": "visitor_map", "type": "redHerring", "icon": "warning", "enterable": false },
+      { "id": "denied_keys", "label": "denied", "type": "trap", "icon": "warning", "trapEffect": "back", "enterable": false },
+      { "id": "local_etc", "label": "etc", "type": "lore", "icon": "paper", "enterable": false, "loreText": "System configuration files. Most require root access." }
     ]
   },
 

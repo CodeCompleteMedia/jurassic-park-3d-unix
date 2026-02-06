@@ -294,6 +294,209 @@
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
     }
+
+    /* Terminal Puzzle UI */
+    #terminal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 180;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #terminal-overlay.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    #terminal-window {
+      background: #0a0a0a;
+      border: 1px solid #00ff00;
+      padding: 30px;
+      width: 500px;
+      max-width: 90%;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 50px rgba(0, 255, 0, 0.05);
+    }
+
+    #terminal-header {
+      color: #00ff00;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    #terminal-prompt {
+      color: #00ff00;
+      margin-bottom: 15px;
+    }
+
+    #terminal-prompt p {
+      font-size: 12px;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    #terminal-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 18px;
+      padding: 8px 0;
+      outline: none;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    #terminal-input::placeholder {
+      color: #005500;
+    }
+
+    #terminal-input:focus {
+      border-bottom-color: #00ff00;
+      box-shadow: 0 4px 10px rgba(0, 255, 0, 0.2);
+    }
+
+    #terminal-hint {
+      color: #00aa00;
+      font-size: 10px;
+      margin-top: 15px;
+      letter-spacing: 1px;
+    }
+
+    #terminal-feedback {
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 11px;
+      display: none;
+    }
+
+    #terminal-feedback.visible {
+      display: block;
+    }
+
+    #terminal-feedback.success {
+      background: rgba(0, 255, 0, 0.1);
+      border: 1px solid #00ff00;
+      color: #00ff00;
+    }
+
+    #terminal-feedback.error {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid #ff0000;
+      color: #ff4444;
+    }
+
+    #terminal-feedback.warning {
+      background: rgba(255, 170, 0, 0.1);
+      border: 1px solid #ffaa00;
+      color: #ffaa00;
+    }
+
+    .terminal-close-hint {
+      margin-top: 20px;
+      color: #005500;
+      font-size: 10px;
+      text-align: right;
+      letter-spacing: 2px;
+    }
+
+    /* Password part indicators */
+    .password-parts {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+
+    .password-part {
+      padding: 5px 12px;
+      font-size: 10px;
+      border: 1px solid #333;
+      color: #555;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .password-part.found {
+      border-color: #00ff00;
+      color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+
+    .password-part.valid {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.2);
+    }
+
+    .password-part.invalid {
+      border-color: #ff0000;
+      color: #ff4444;
+      background: rgba(255, 0, 0, 0.1);
+    }
+
+    /* Clue Panel */
+    #clue-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid #7fd0e6;
+      padding: 30px;
+      max-width: 450px;
+      width: 90%;
+      z-index: 185;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #clue-panel.visible {
+      display: block;
+      opacity: 1;
+    }
+
+    #clue-panel .clue-header {
+      color: #7fd0e6;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #7fd0e6;
+      padding-bottom: 10px;
+    }
+
+    #clue-panel .clue-content {
+      color: #aaddff;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      letter-spacing: 0.5px;
+    }
+
+    #clue-panel .clue-close-hint {
+      margin-top: 25px;
+      color: #7fd0e6;
+      font-size: 10px;
+      text-align: center;
+      letter-spacing: 2px;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -324,6 +527,33 @@
     <h3>DATA FILE</h3>
     <p id="lore-text"></p>
     <div class="close-hint">PRESS ANY KEY TO CLOSE</div>
+  </div>
+
+  <!-- Terminal Puzzle UI -->
+  <div id="terminal-overlay">
+    <div id="terminal-window">
+      <div id="terminal-header">SECURITY CHECKPOINT</div>
+      <div id="terminal-prompt">
+        <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
+        <input type="text" id="terminal-input" class="terminal-input" placeholder="PASSWORD" autocomplete="off" />
+      </div>
+      <div class="password-parts">
+        <div class="password-part" id="part-project">PROJECT</div>
+        <div class="password-part" id="part-sector">SECTOR</div>
+        <div class="password-part" id="part-keyword">KEYWORD</div>
+        <div class="password-part" id="part-number">NUMBER</div>
+      </div>
+      <div id="terminal-hint">Hint: Search /usr for clues. Format: PROJECT-SECTOR-KEYWORD-NUMBER</div>
+      <div id="terminal-feedback"></div>
+      <div class="terminal-close-hint">PRESS ESC TO CANCEL</div>
+    </div>
+  </div>
+
+  <!-- Clue Panel -->
+  <div id="clue-panel">
+    <div class="clue-header" id="clue-title">DATA FILE</div>
+    <div class="clue-content" id="clue-text"></div>
+    <div class="clue-close-hint">PRESS ANY KEY TO CLOSE</div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
