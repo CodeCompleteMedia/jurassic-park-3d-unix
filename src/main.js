@@ -66,12 +66,13 @@ const state = {
   // Camera state
   cameraMode: 'folder', // 'folder' | 'node'
   targetLookAt: new THREE.Vector3(0, 0, 0), // What the camera is looking at
-  targetDistance: CAMERA_CONFIG.folder.maxDistance, // Distance from lookAt target
-  targetHeight: CAMERA_CONFIG.folder.maxHeight, // Height above lookAt target
+  targetDistance: CAMERA_CONFIG.folder.initialDistance, // Distance from lookAt target
+  targetHeight: CAMERA_CONFIG.folder.initialHeight, // Height above lookAt target
   currentLookAt: new THREE.Vector3(0, 0, 0),
-  currentDistance: CAMERA_CONFIG.folder.maxDistance,
-  currentHeight: CAMERA_CONFIG.folder.maxHeight,
+  currentDistance: CAMERA_CONFIG.folder.initialDistance,
+  currentHeight: CAMERA_CONFIG.folder.initialHeight,
   isAnimating: false,
+  isInitialLoad: true, // Track first load for camera distance
   lastFolderDistance: CAMERA_CONFIG.folder.maxDistance, // Remember folder zoom level for returning
   nodeZoomDistance: CAMERA_CONFIG.node.selectDistance // Distance when zoomed into a node
 };
@@ -834,12 +835,18 @@ function setCameraToFolder(folderId, zoomIn = true) {
   // Target is the center of the folder platform
   state.targetLookAt.set(xPos, CONFIG.platform.height / 2, platformZ);
 
-  // Zoom in to see the whole folder using config values
-  const baseDistance = zoomIn ? CAMERA_CONFIG.folder.maxDistance : CAMERA_CONFIG.folder.maxDistance;
-  const baseHeight = zoomIn ? CAMERA_CONFIG.folder.maxHeight : CAMERA_CONFIG.folder.maxHeight;
+  // Use initialDistance only on first load, otherwise use maxDistance
+  const useInitial = state.isInitialLoad && zoomIn;
+  const baseDistance = useInitial ? CAMERA_CONFIG.folder.initialDistance : CAMERA_CONFIG.folder.maxDistance;
+  const baseHeight = useInitial ? CAMERA_CONFIG.folder.initialHeight : CAMERA_CONFIG.folder.maxHeight;
   state.targetDistance = baseDistance;
   state.targetHeight = baseHeight;
   state.cameraMode = 'folder';
+
+  // Clear initial load flag after first set
+  if (state.isInitialLoad) {
+    state.isInitialLoad = false;
+  }
 }
 
 function updateCameraDebug() {
