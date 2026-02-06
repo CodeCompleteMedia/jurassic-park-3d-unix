@@ -866,6 +866,23 @@ function setupEventListeners() {
       console.log('[DEV] Skipped to:', terminalNode.nextFolderId);
     }
   });
+
+  // Start clock
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
+// Update CDE-style clock
+function updateClock() {
+  const clockEl = document.getElementById('clock');
+  if (clockEl) {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    clockEl.textContent = `${displayHours}:${minutes} ${ampm}`;
+  }
 }
 
 function onMouseMove(event) {
@@ -1659,9 +1676,14 @@ function submitPassword() {
   if (allCorrect) {
     feedback.className = 'visible success';
     feedback.style.display = 'block';
-    feedback.innerHTML = '<div style="text-align: center;"><div style="font-size: 16px; margin-bottom: 15px;">*** AUTH OK: ACCESS GRANTED ***</div><button id="nav-continue-btn" class="terminal-nav-btn" onclick="continueToNextFolder()">CONTINUE &gt;&gt;</button></div>';
-    // Hide the ESC cancel hint
-    document.querySelector('.terminal-close-hint').style.display = 'none';
+    feedback.innerHTML = '<div style="text-align: center;"><div style="font-size: 16px; margin-bottom: 15px;">*** AUTH OK: ACCESS GRANTED ***</div><button id="nav-continue-btn" class="terminal-nav-btn">CONTINUE &gt;&gt;</button></div>';
+    // Add event listener for continue button
+    setTimeout(() => {
+      const continueBtn = document.getElementById('nav-continue-btn');
+      if (continueBtn) {
+        continueBtn.addEventListener('click', continueToNextFolder);
+      }
+    }, 10);
   } else {
     feedback.className = 'visible error';
     feedback.style.display = 'block';

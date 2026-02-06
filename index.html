@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SECURITY SYSTEM - Jurassic Park 3D</title>
+  <title>File Manager - Jurassic Park 3D</title>
   <style>
+    /* 90s CDE/X Window System Desktop Styling */
     * {
       margin: 0;
       padding: 0;
@@ -18,27 +19,280 @@
     }
 
     @font-face {
-      font-family: 'Monospace';
+      font-family: 'X11';
+      src: local('Helvetica'), local('Arial'), local('sans-serif');
+    }
+
+    @font-face {
+      font-family: 'Terminal';
       src: local('Courier New'), local('Lucida Console'), local('Monaco');
     }
 
+    /* Desktop Background - Classic CDE Teal/Gray */
     body {
       overflow: hidden;
-      background: #050607;
-      font-family: 'Courier New', 'Lucida Console', monospace;
+      background: #4d5d6d;
+      font-family: 'Helvetica', 'Arial', sans-serif;
       cursor: default;
+      user-select: none;
     }
 
-    #canvas-container {
+    /* Desktop wallpaper pattern */
+    #desktop {
       position: fixed;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3a4d5c 0%, #4d5d6d 50%, #5a6b7a 100%);
+    }
+
+    /* Subtle grid pattern overlay */
+    #desktop::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100px 100px;
+      pointer-events: none;
+    }
+
+    /* X Window System Window */
+    #xterm-window {
+      position: absolute;
+      left: 50%;
+      top: 40px;
+      transform: translateX(-50%);
+      background: #3d3d3d;
+      border: 2px solid #7a7a7a;
+      border-radius: 0;
+      box-shadow:
+        2px 2px 0 #2a2a2a,
+        inset 1px 1px 0 #5a5a5a,
+        0 10px 30px rgba(0,0,0,0.4);
+      min-width: 900px;
+      max-width: 95vw;
+    }
+
+    /* X Window Title Bar */
+    .x-titlebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 24px;
+      background: linear-gradient(180deg, #636363 0%, #4a4a4a 100%);
+      border-bottom: 1px solid #2a2a2a;
+      padding: 0 4px;
+    }
+
+    .x-titlebar.inactive {
+      background: linear-gradient(180deg, #525252 0%, #404040 100%);
+    }
+
+    .x-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #cccccc;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .x-icon {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, #6b8cce 0%, #4a6aa8 100%);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+    }
+
+    .x-controls {
+      display: flex;
+      gap: 3px;
+    }
+
+    .x-btn {
+      width: 18px;
+      height: 18px;
+      border: 1px solid #5a5a5a;
+      background: linear-gradient(180deg, #6a6a6a 0%, #525252 100%);
+      color: #cccccc;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+    }
+
+    .x-btn:hover {
+      background: linear-gradient(180deg, #7a7a7a 0%, #626262 100%);
+    }
+
+    .x-btn:active {
+      background: linear-gradient(180deg, #525252 0%, #4a4a4a 100%);
+      transform: inset 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .x-btn.close {
+      background: linear-gradient(180deg, #c44 0%, #a33 100%);
+      border-color: #822;
+      color: white;
+    }
+
+    .x-btn.close:hover {
+      background: linear-gradient(180deg, #d55 0%, #b44 100%);
+    }
+
+    /* Menu Bar inside window */
+    .x-menubar {
+      display: flex;
+      background: #4a4a4a;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 2px 6px;
+      gap: 4px;
+    }
+
+    .x-menu-item {
+      color: #cccccc;
+      font-size: 11px;
+      padding: 2px 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .x-menu-item:hover {
+      background: #6b8cce;
+      color: white;
+      border-color: #4a6aa8;
+    }
+
+    /* X Window Content Area */
+    .x-content {
+      background: #1a1a1a;
+      padding: 0;
+      height: 600px;
+      position: relative;
+    }
+
+    #canvas-container {
       width: 100%;
       height: 100%;
     }
 
     canvas {
       display: block;
+    }
+
+    /* Terminal/Prompt styling inside window */
+    .x-toolbar {
+      background: #454545;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .x-toolbar-btn {
+      background: transparent;
+      border: 1px solid #5a5a5a;
+      color: #cccccc;
+      font-size: 10px;
+      padding: 2px 8px;
+      cursor: pointer;
+    }
+
+    .x-toolbar-btn:hover {
+      background: #5a5a5a;
+    }
+
+    .x-separator {
+      width: 1px;
+      height: 16px;
+      background: #5a5a5a;
+    }
+
+    .x-path {
+      color: #8a8a8a;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* CDE-style Taskbar at bottom */
+    #cde-taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 28px;
+      background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+      border-top: 2px solid #6a6a6a;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      z-index: 1000;
+    }
+
+    .cde-start-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(180deg, #6b8cce 0%, #4a6aa8 100%);
+      border: 1px solid #3a5a88;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 8px;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .cde-start-btn:hover {
+      background: linear-gradient(180deg, #7a9cde 0%, #5a7ab8 100%);
+    }
+
+    .cde-task-button {
+      background: linear-gradient(180deg, #525252 0%, #454545 100%);
+      border: 1px solid #5a5a5a;
+      color: #cccccc;
+      font-size: 11px;
+      padding: 3px 12px;
+      cursor: pointer;
+      margin-right: 2px;
+      min-width: 100px;
+      text-align: left;
+    }
+
+    .cde-task-button:hover {
+      background: linear-gradient(180deg, #5a5a5a 0%, #525252 100%);
+      border-color: #7a7a7a;
+    }
+
+    .cde-task-button.active {
+      background: linear-gradient(180deg, #3a4a5a 0%, #2a3a4a 100%);
+      border-color: #6b8cce;
+      color: white;
+    }
+
+    .cde-clock {
+      margin-left: auto;
+      color: #cccccc;
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #2a2a2a;
+      border: 1px solid #4a4a4a;
     }
 
     /* CRT scanline effect overlay */
@@ -51,239 +305,97 @@
       pointer-events: none;
       background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.1) 0px,
-        rgba(0, 0, 0, 0.1) 1px,
+        rgba(0, 0, 0, 0.08) 0px,
+        rgba(0, 0, 0, 0.08) 1px,
         transparent 1px,
         transparent 2px
       );
-      z-index: 100;
+      z-index: 9999;
     }
 
-    /* UI Overlay */
+    /* UI Overlay for game elements */
     #ui-overlay {
-      position: fixed;
-      top: 0;
+      position: absolute;
+      top: 24px;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 52px);
       pointer-events: none;
       z-index: 50;
     }
 
-    /* Breadcrumb path */
+    /* Breadcrumb path - now styled as terminal prompt */
     #breadcrumb {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      color: #00e0d6;
-      font-size: 14px;
-      text-shadow: 0 0 10px rgba(0, 224, 214, 0.5);
-      letter-spacing: 1px;
-      opacity: 0.9;
+      top: 8px;
+      left: 8px;
+      color: #00ff00;
+      font-size: 12px;
+      font-family: 'Courier New', 'Lucida Console', monospace;
       pointer-events: auto;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 4px 8px;
+      border-radius: 2px;
     }
 
     #breadcrumb .path-separator {
-      color: #4fffe9;
-      margin: 0 8px;
-      pointer-events: none;
+      color: #00aa00;
     }
 
     #breadcrumb .folder-item {
       cursor: pointer;
-      padding: 2px 4px;
-      border-radius: 2px;
-      transition: all 0.2s ease;
+      padding: 1px 4px;
     }
 
     #breadcrumb .folder-item:hover {
-      background: rgba(0, 224, 214, 0.15);
-      text-shadow: 0 0 15px rgba(0, 224, 214, 0.8);
+      background: rgba(0, 255, 0, 0.2);
     }
 
     #breadcrumb .folder-item.current {
-      color: #c96b63;
-      text-shadow: 0 0 15px rgba(201, 107, 99, 0.6);
+      color: #00aa00;
       cursor: default;
     }
 
-    #breadcrumb .folder-item.current:hover {
-      background: transparent;
-    }
-
     #breadcrumb .folder-item.active {
-      color: #4fffe9;
-      text-shadow: 0 0 20px rgba(79, 255, 233, 1);
+      color: #00ff00;
+      font-weight: bold;
     }
 
     /* Camera debug helper */
     #camera-debug {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      color: #00e0d6;
-      font-size: 11px;
+      top: 8px;
+      right: 8px;
+      color: #00ff00;
+      font-size: 10px;
       font-family: 'Courier New', 'Lucida Console', monospace;
       text-align: right;
-      line-height: 1.6;
-      opacity: 0.7;
-      text-shadow: 0 0 5px rgba(0, 224, 214, 0.3);
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 10px;
+      border-radius: 2px;
     }
 
     #camera-debug .label {
-      color: #4fffe9;
-      opacity: 0.6;
+      color: #00aa00;
     }
 
     #camera-debug .value {
-      color: #7fd0e6;
-    }
-
-    #camera-debug .mode-folder {
-      color: #b45a55;
-    }
-
-    #camera-debug .mode-node {
-      color: #00e0d6;
+      color: #00ff00;
     }
 
     /* Status line */
     #status-line {
       position: absolute;
-      bottom: 20px;
+      bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
-      color: #7fd0e6;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      opacity: 0.8;
-      transition: color 0.3s ease;
-    }
-
-    #status-line.warning {
-      color: #ff4a4a;
-      animation: blink 0.5s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 0.8; }
-      50% { opacity: 0.3; }
-    }
-
-    /* Win overlay */
-    #win-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(5, 6, 7, 0.9);
-      z-index: 200;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    #win-overlay.visible {
-      display: flex;
-      opacity: 1;
-    }
-
-    #win-content {
-      text-align: center;
-      color: #00e0d6;
-    }
-
-    #win-content h1 {
-      font-size: 48px;
-      font-weight: normal;
-      letter-spacing: 8px;
-      text-shadow: 0 0 30px rgba(0, 224, 214, 0.8), 0 0 60px rgba(0, 224, 214, 0.4);
-      margin-bottom: 20px;
-      animation: winPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes winPulse {
-      0%, 100% { text-shadow: 0 0 30px rgba(0, 224, 214, 0.8), 0 0 60px rgba(0, 224, 214, 0.4); }
-      50% { text-shadow: 0 0 50px rgba(0, 224, 214, 1), 0 0 100px rgba(0, 224, 214, 0.6); }
-    }
-
-    #win-content p {
-      font-size: 14px;
-      color: #7fd0e6;
-      letter-spacing: 3px;
-      opacity: 0.7;
-    }
-
-    /* Lore panel */
-    #lore-panel {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #0a0a0a;
-      border: 1px solid #00e0d6;
-      padding: 0;
-      max-width: 400px;
-      width: 90%;
-      display: none;
-      z-index: 150;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      box-shadow: 0 0 20px rgba(0, 224, 214, 0.2);
-    }
-
-    #lore-panel.visible {
-      display: block;
-      opacity: 1;
-    }
-
-    #lore-panel .window-titlebar {
-      border-bottom-color: #00e0d6;
-    }
-
-    #lore-panel .window-title {
-      color: #00e0d6;
-    }
-
-    #lore-panel .window-btn.close {
-      color: #00e0d6;
-      border-color: #00e0d6;
-    }
-
-    #lore-panel .window-btn.close:hover {
-      background: rgba(0, 224, 214, 0.2);
-    }
-
-    #lore-panel .window-content {
-      padding: 20px 25px;
-    }
-
-    #lore-panel h3 {
-      color: #00e0d6;
-      font-size: 14px;
-      letter-spacing: 2px;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-    }
-
-    #lore-panel p {
-      color: #7fd0e6;
+      color: #00ff00;
       font-size: 12px;
-      line-height: 1.6;
-      letter-spacing: 1px;
-    }
-
-    #lore-panel .close-hint {
-      margin-top: 20px;
-      color: #00e0d6;
-      font-size: 10px;
-      opacity: 0.6;
-      text-align: center;
-      letter-spacing: 2px;
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 4px 12px;
+      border-radius: 2px;
     }
 
     /* Loading screen */
@@ -293,166 +405,175 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: #050607;
+      background: #3a3a3a;
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 300;
-      transition: opacity 0.5s ease;
+      z-index: 10000;
     }
 
     #loading.hidden {
-      opacity: 0;
-      pointer-events: none;
+      display: none;
     }
 
     #loading .loader {
-      color: #00e0d6;
-      font-size: 16px;
-      letter-spacing: 4px;
-      animation: loadPulse 1.5s ease-in-out infinite;
+      color: #cccccc;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    @keyframes loadPulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    #loading .loader::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid #6b8cce;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    /* Terminal Puzzle UI */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Lore panel - X Window Style */
+    #lore-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #3d3d3d;
+      border: 2px solid #7a7a7a;
+      min-width: 350px;
+      box-shadow: 2px 2px 0 #2a2a2a, 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 500;
+      display: none;
+    }
+
+    #lore-panel.visible {
+      display: block;
+    }
+
+    #lore-panel .x-titlebar {
+      background: linear-gradient(180deg, #525252 0%, #454545 100%);
+    }
+
+    #lore-panel .x-title {
+      color: #8ac;
+    }
+
+    #lore-panel .x-content {
+      background: #2a2a2a;
+      padding: 20px;
+    }
+
+    #lore-panel h3 {
+      color: #8ac;
+      font-size: 13px;
+      margin-bottom: 12px;
+      font-weight: normal;
+    }
+
+    #lore-panel p {
+      color: #aabbcc;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Terminal Puzzle UI - X Terminal Style */
     #terminal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.7);
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 180;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      z-index: 800;
     }
 
     #terminal-overlay.visible {
       display: flex;
-      opacity: 1;
     }
 
     #terminal-window {
-      background: #0a0a0a;
-      border: 1px solid #00ff00;
-      padding: 0;
-      width: 500px;
-      max-width: 90%;
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+      background: #3d3d3d;
+      border: 2px solid #7a7a7a;
+      box-shadow: 2px 2px 0 #2a2a2a;
+      min-width: 450px;
     }
 
-    /* System window title bar */
-    .window-titlebar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
-      background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
-      border-bottom: 1px solid #00ff00;
+    #terminal-window .x-titlebar {
+      background: linear-gradient(180deg, #4a6a4a 0%, #3a5a3a 100%);
     }
 
-    .window-title {
-      color: #00ff00;
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+    #terminal-window .x-title {
+      color: #8cce8c;
     }
 
-    .window-controls {
-      display: flex;
-      gap: 8px;
+    #terminal-window .x-btn.close {
+      background: linear-gradient(180deg, #8c4 0%, #6a3 100%);
+      border-color: #482;
+      color: white;
     }
 
-    .window-btn {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: 1px solid #444;
-      color: #666;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: 'Courier New', monospace;
-      line-height: 1;
-    }
-
-    .window-btn.close {
-      color: #00ff00;
-      border-color: #00ff00;
-    }
-
-    .window-btn.close:hover {
-      background: rgba(0, 255, 0, 0.2);
-    }
-
-    .window-content {
-      padding: 20px 25px 25px;
+    #terminal-window .x-content {
+      background: #1a1a1a;
+      padding: 20px;
     }
 
     #terminal-header {
       color: #00ff00;
+      font-family: 'Courier New', monospace;
       font-size: 14px;
-      letter-spacing: 2px;
       margin-bottom: 15px;
-      text-transform: uppercase;
     }
 
     #terminal-prompt {
       color: #00ff00;
+      font-family: 'Courier New', monospace;
       margin-bottom: 15px;
     }
 
     #terminal-prompt p {
-      font-size: 12px;
+      font-size: 11px;
+      color: #00aa00;
       margin-bottom: 8px;
-      opacity: 0.8;
     }
 
     #terminal-input {
       width: 100%;
       background: transparent;
       border: none;
-      border-bottom: 2px solid #00ff00;
+      border-bottom: 1px solid #00ff00;
       color: #00ff00;
       font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 18px;
+      font-size: 16px;
       padding: 8px 0;
       outline: none;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    #terminal-input::placeholder {
-      color: #005500;
+      letter-spacing: 2px;
     }
 
     #terminal-input:focus {
       border-bottom-color: #00ff00;
-      box-shadow: 0 4px 10px rgba(0, 255, 0, 0.2);
     }
 
     #terminal-hint {
       color: #00aa00;
       font-size: 10px;
       margin-top: 15px;
-      letter-spacing: 1px;
+      font-family: 'Courier New', monospace;
     }
 
     #terminal-feedback {
-      margin-top: 20px;
-      padding: 15px;
+      margin-top: 15px;
+      padding: 10px;
       font-size: 11px;
+      font-family: 'Courier New', monospace;
       display: none;
     }
 
@@ -461,83 +582,30 @@
     }
 
     #terminal-feedback.success {
-      background: rgba(0, 255, 0, 0.1);
+      background: rgba(0, 100, 0, 0.3);
       border: 1px solid #00ff00;
       color: #00ff00;
-    }
-
-    .terminal-nav-btn {
-      width: 100%;
-      padding: 12px 20px;
-      background: transparent;
-      border: 1px solid #00ff00;
-      color: #00ff00;
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 14px;
-      letter-spacing: 3px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-    }
-
-    .terminal-nav-btn:hover {
-      background: rgba(0, 255, 0, 0.2);
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
     }
 
     #terminal-feedback.error {
-      background: rgba(255, 0, 0, 0.1);
-      border: 1px solid #ff0000;
-      color: #ff4444;
+      background: rgba(100, 0, 0, 0.3);
+      border: 1px solid #ff4444;
+      color: #ff6666;
     }
 
-    #terminal-feedback.warning {
-      background: rgba(255, 170, 0, 0.1);
-      border: 1px solid #ffaa00;
-      color: #ffaa00;
-    }
-
-    .terminal-close-hint {
-      margin-top: 20px;
-      color: #005500;
-      font-size: 10px;
-      text-align: right;
-      letter-spacing: 2px;
-    }
-
-    #terminal-window #skip-puzzle-btn {
-      display: block;
-      margin: 15px auto 0;
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid #444;
-      color: #666;
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    #terminal-window #skip-puzzle-btn:hover {
-      border-color: #ffaa00;
-      color: #ffaa00;
-    }
-
-    /* Password part indicators */
     .password-parts {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin-top: 15px;
       justify-content: center;
     }
 
     .password-part {
-      padding: 5px 12px;
+      padding: 4px 10px;
       font-size: 10px;
-      border: 1px solid #333;
-      color: #555;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
+      font-family: 'Courier New', monospace;
+      border: 1px solid #444;
+      color: #666;
     }
 
     .password-part.found {
@@ -553,99 +621,175 @@
     }
 
     .password-part.invalid {
-      border-color: #ff0000;
-      color: #ff4444;
+      border-color: #ff4444;
+      color: #ff6666;
       background: rgba(255, 0, 0, 0.1);
     }
 
-    /* Clue Panel */
+    #terminal-window #skip-puzzle-btn {
+      display: block;
+      margin: 15px auto 0;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid #555;
+      color: #888;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    #terminal-window #skip-puzzle-btn:hover {
+      border-color: #ffaa00;
+      color: #ffaa00;
+    }
+
+    /* Clue Panel - X Window Style */
     #clue-panel {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #0a0a0a;
-      border: 1px solid #7fd0e6;
-      padding: 0;
-      max-width: 450px;
-      width: 90%;
-      z-index: 185;
+      background: #3d3d3d;
+      border: 2px solid #7a7a7a;
+      min-width: 400px;
+      box-shadow: 2px 2px 0 #2a2a2a;
+      z-index: 600;
       display: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      box-shadow: 0 0 20px rgba(127, 208, 230, 0.2);
     }
 
     #clue-panel.visible {
       display: block;
-      opacity: 1;
     }
 
-    #clue-panel .window-titlebar {
-      border-bottom-color: #7fd0e6;
+    #clue-panel .x-titlebar {
+      background: linear-gradient(180deg, #525252 0%, #454545 100%);
     }
 
-    #clue-panel .window-title {
-      color: #7fd0e6;
-    }
-
-    #clue-panel .window-btn.close {
-      color: #7fd0e6;
-      border-color: #7fd0e6;
-    }
-
-    #clue-panel .window-btn.close:hover {
-      background: rgba(127, 208, 230, 0.2);
-    }
-
-    #clue-panel .window-content {
-      padding: 20px 25px;
+    #clue-panel .x-content {
+      background: #2a2a2a;
+      padding: 20px;
     }
 
     #clue-panel .clue-header {
-      color: #7fd0e6;
+      color: #8ac;
       font-size: 12px;
-      letter-spacing: 2px;
       margin-bottom: 15px;
-      text-transform: uppercase;
+      font-weight: normal;
     }
 
     #clue-panel .clue-content {
-      color: #aaddff;
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 13px;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      letter-spacing: 0.5px;
+      color: #aabbcc;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.7;
     }
 
-    #clue-panel .clue-close-hint {
-      margin-top: 25px;
-      color: #7fd0e6;
-      font-size: 10px;
+    /* Win overlay */
+    #win-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+    }
+
+    #win-overlay.visible {
+      display: flex;
+    }
+
+    #win-content {
       text-align: center;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+    }
+
+    #win-content h1 {
+      font-size: 32px;
+      font-weight: normal;
+      letter-spacing: 4px;
+      margin-bottom: 15px;
+    }
+
+    #win-content p {
+      font-size: 12px;
+      color: #00aa00;
       letter-spacing: 2px;
-      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-  <div id="loading"><div class="loader">INITIALIZING SYSTEM...</div></div>
-
-  <div id="canvas-container"></div>
-  <div id="scanlines"></div>
-
-  <div id="ui-overlay">
-    <div id="breadcrumb">/usr</div>
-    <div id="camera-debug">
-      <div><span class="label">MODE:</span> <span id="debug-mode" class="value">FOLDER</span></div>
-      <div><span class="label">DISTANCE:</span> <span id="debug-distance" class="value">--</span></div>
-      <div><span class="label">RANGE:</span> <span id="debug-range" class="value">--</span></div>
-      <div><span class="label">TARGET:</span> <span id="debug-target" class="value">--</span></div>
-    </div>
-    <div id="status-line">SELECT NODE</div>
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="loader">Initializing...</div>
   </div>
 
+  <!-- Desktop Background -->
+  <div id="desktop"></div>
+
+  <!-- Main X Window -->
+  <div id="xterm-window">
+    <div class="x-titlebar inactive">
+      <div class="x-title">
+        <div class="x-icon">fm</div>
+        File Manager - /usr
+      </div>
+      <div class="x-controls">
+        <button class="x-btn" title="Minimize">_</button>
+        <button class="x-btn" title="Maximize">□</button>
+        <button class="x-btn close" title="Close">X</button>
+      </div>
+    </div>
+    <div class="x-menubar">
+      <div class="x-menu-item">File</div>
+      <div class="x-menu-item">Edit</div>
+      <div class="x-menu-item">View</div>
+      <div class="x-menu-item">Go</div>
+      <div class="x-menu-item">Help</div>
+    </div>
+    <div class="x-toolbar">
+      <button class="x-toolbar-btn" title="Back">◄</button>
+      <button class="x-toolbar-btn" title="Forward">►</button>
+      <button class="x-toolbar-btn" title="Up">▲</button>
+      <button class="x-toolbar-btn" title="Home">⌂</button>
+      <div class="x-separator"></div>
+      <span class="x-path">/usr</span>
+      <div class="x-separator"></div>
+      <button class="x-toolbar-btn" title="Refresh">↻</button>
+    </div>
+    <div class="x-content">
+      <div id="canvas-container"></div>
+      <div id="ui-overlay">
+        <div id="breadcrumb">/usr</div>
+        <div id="camera-debug">
+          <div><span class="label">MODE:</span> <span class="value" id="debug-mode">FOLDER</span></div>
+          <div><span class="label">DIST:</span> <span class="value" id="debug-distance">--</span></div>
+          <div><span class="label">RANGE:</span> <span class="value" id="debug-range">--</span></div>
+          <div><span class="label">TARGET:</span> <span class="value" id="debug-target">--</span></div>
+        </div>
+        <div id="status-line">SELECT NODE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRT Scanlines -->
+  <div id="scanlines"></div>
+
+  <!-- CDE Taskbar -->
+  <div id="cde-taskbar">
+    <button class="cde-start-btn">
+      <span>✦</span> Programs
+    </button>
+    <button class="cde-task-button active">File Manager</button>
+    <button class="cde-task-button">Terminal</button>
+    <div class="cde-clock" id="clock">12:00 PM</div>
+  </div>
+
+  <!-- Win Overlay -->
   <div id="win-overlay">
     <div id="win-content">
       <h1>SECURITY SYSTEM: ONLINE</h1>
@@ -653,29 +797,37 @@
     </div>
   </div>
 
+  <!-- Lore Panel -->
   <div id="lore-panel">
-    <div class="window-titlebar">
-      <span class="window-title">DATA FILE</span>
-      <div class="window-controls">
-        <button class="window-btn close" id="lore-close-btn" title="Close">X</button>
+    <div class="x-titlebar">
+      <div class="x-title">
+        <div class="x-icon">📄</div>
+        Data File
+      </div>
+      <div class="x-controls">
+        <button class="x-btn close" id="lore-close-btn">X</button>
       </div>
     </div>
-    <div class="window-content">
+    <div class="x-content">
+      <h3 id="lore-title"></h3>
       <p id="lore-text"></p>
-      <div class="close-hint">PRESS ANY KEY TO CLOSE</div>
     </div>
   </div>
 
   <!-- Terminal Puzzle UI -->
   <div id="terminal-overlay">
     <div id="terminal-window">
-      <div class="window-titlebar">
-        <span class="window-title">SECURITY CHECKPOINT</span>
-        <div class="window-controls">
-          <button class="window-btn close" id="terminal-close-btn" title="Close (ESC)">X</button>
+      <div class="x-titlebar">
+        <div class="x-title">
+          <div class="x-icon" style="background: linear-gradient(135deg, #4a8c4a 0%, #3a6a3a 100%);">$</div>
+          Security Checkpoint
+        </div>
+        <div class="x-controls">
+          <button class="x-btn close" id="terminal-close-btn">X</button>
         </div>
       </div>
-      <div class="window-content">
+      <div class="x-content">
+        <div id="terminal-header">[ SECURITY ACCESS CONTROL ]</div>
         <form id="terminal-form" autocomplete="off">
           <div id="terminal-prompt">
             <p>ENTER PASSWORD TO UNLOCK NEXT FOLDER</p>
@@ -690,22 +842,25 @@
         </div>
         <div id="terminal-hint">Hint: Search /usr for clues. Format: PROJECT-SECTOR-KEYWORD-NUMBER</div>
         <div id="terminal-feedback"></div>
-        <button id="skip-puzzle-btn" title="DEV: Skip this puzzle">[x] SKIP PUZZLE</button>
+        <button id="skip-puzzle-btn">[x] SKIP PUZZLE</button>
       </div>
     </div>
   </div>
 
   <!-- Clue Panel -->
   <div id="clue-panel">
-    <div class="window-titlebar">
-      <span class="window-title" id="clue-title">DATA FILE</span>
-      <div class="window-controls">
-        <button class="window-btn close" id="clue-close-btn" title="Close">X</button>
+    <div class="x-titlebar">
+      <div class="x-title">
+        <div class="x-icon">📄</div>
+        <span id="clue-title">Data File</span>
+      </div>
+      <div class="x-controls">
+        <button class="x-btn close" id="clue-close-btn">X</button>
       </div>
     </div>
-    <div class="window-content">
+    <div class="x-content">
+      <div class="clue-header" id="clue-header">DATA FILE</div>
       <div class="clue-content" id="clue-text"></div>
-      <div class="clue-close-hint">PRESS ANY KEY TO CLOSE</div>
     </div>
   </div>
 
