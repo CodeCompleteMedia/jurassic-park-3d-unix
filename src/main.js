@@ -615,11 +615,11 @@ function drawFolderConnections() {
         0.2,
         platform.position.z - platform.userData.depth / 2 - 2
       ),
-      // Entry point - back of folder (for joining)
+      // Entry point - front of folder (positive Z) - all incoming lines join here
       entry: new THREE.Vector3(
         platform.position.x,
         0.2,
-        platform.position.z - platform.userData.depth / 2 - 2
+        platform.position.z + platform.userData.depth / 2 + 2
       )
     };
   });
@@ -638,7 +638,7 @@ function drawFolderConnections() {
         // P0 = start (back of folder)
         // P1 = go straight for a bit (negative Z)
         // P2 = curve at 35 degrees toward destination X
-        // P3 = end (back of destination folder)
+        // P3 = end (front of destination folder - all lines join here)
 
         const straightDist = 15; // How far to go straight before curving
         const curveStrength = Math.abs(endPoint.x - startPoint.x) * 0.35; // 35 degree angle
