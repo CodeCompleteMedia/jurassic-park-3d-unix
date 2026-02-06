@@ -1009,9 +1009,11 @@
         resizeStartY = e.clientY;
         resizeStartWidth = windowEl.offsetWidth;
         resizeStartHeight = windowEl.offsetHeight;
+        // Get actual position before removing transform
+        const rect = windowEl.getBoundingClientRect();
         windowEl.style.transform = 'none';
-        windowEl.style.left = windowEl.offsetLeft + 'px';
-        windowEl.style.top = windowEl.offsetTop + 'px';
+        windowEl.style.left = rect.left + 'px';
+        windowEl.style.top = rect.top + 'px';
       });
     })();
   </script>
