@@ -71,6 +71,9 @@ const state = {
   currentLookAt: new THREE.Vector3(0, 0, 0),
   currentDistance: CAMERA_CONFIG.folder.initialDistance,
   currentHeight: CAMERA_CONFIG.folder.initialHeight,
+  cameraYaw: 0, // Left/right rotation
+  cameraPitch: 0, // Up/down rotation
+  isLooking: false, // Currently looking around with right mouse
   isAnimating: false,
   isInitialLoad: true, // Track first load for camera distance
   lastFolderDistance: CAMERA_CONFIG.folder.maxDistance, // Remember folder zoom level for returning
@@ -861,16 +864,26 @@ function onMouseDown(event) {
   }
 
   if (event.button === 2 && !state.isTransitioning && !state.isWon) {
-    // Right drag for slight yaw rotation
+    // Right drag for looking around (yaw and pitch)
+    state.isLooking = true;
     const startX = event.clientX;
-    const startYaw = camera.rotation.y;
+    const startY = event.clientY;
+    const startYaw = state.cameraYaw;
+    const startPitch = state.cameraPitch;
 
     const onMouseMove = (e) => {
-      const deltaX = (e.clientX - startX) * 0.001;
-      camera.rotation.y = THREE.MathUtils.clamp(startYaw - deltaX, -0.17, 0.17);
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      // Update yaw (left/right) - smooth rotation
+      state.cameraYaw = THREE.MathUtils.clamp(startYaw - deltaX * 0.002, -0.5, 0.5);
+
+      // Update pitch (up/down) - smooth rotation, don't go below floor
+      state.cameraPitch = THREE.MathUtils.clamp(startPitch - deltaY * 0.002, -0.3, 0.3);
     };
 
     const onMouseUp = () => {
+      state.isLooking = false;
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
@@ -911,12 +924,27 @@ function updateCameraSmooth(delta) {
   state.currentDistance += (state.targetDistance - state.currentDistance) * smoothFactor;
   state.currentHeight += (state.targetHeight - state.currentHeight) * smoothFactor;
 
-  // Calculate camera position from lookAt, distance, and height
-  const camX = state.currentLookAt.x;
-  const camY = state.currentLookAt.y + state.currentHeight;
-  const camZ = state.currentLookAt.z + state.currentDistance;
+  // Smoothly recenter yaw/pitch when not looking
+  if (!state.isLooking) {
+    state.cameraYaw += (0 - state.cameraYaw) * smoothFactor * 2;
+    state.cameraPitch += (0 - state.cameraPitch) * smoothFactor * 2;
+  }
 
-  camera.position.set(camX, camY, camZ);
+  // Calculate camera position with yaw/pitch
+  const yaw = state.cameraYaw || 0;
+  const pitch = state.cameraPitch || 0;
+
+  const camX = state.currentLookAt.x + Math.sin(yaw) * state.currentDistance * Math.cos(pitch);
+  const camY = state.currentLookAt.y + state.currentHeight + Math.sin(pitch) * state.currentDistance;
+  const camZ = state.currentLookAt.z + Math.cos(yaw) * state.currentDistance * Math.cos(pitch);
+
+  // Don't go below floor
+  if (camY < 2) {
+    camera.position.set(camX, 2, camZ);
+  } else {
+    camera.position.set(camX, camY, camZ);
+  }
+
   camera.lookAt(state.currentLookAt.x, state.currentLookAt.y + 2, state.currentLookAt.z);
 }
 
