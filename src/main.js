@@ -697,18 +697,32 @@ function showCurrentFolder() {
   // Redraw folder connections for visible folders
   drawFolderConnections();
 
-  // Build set of folders to always show: current folder + all in navigation history + next 2 rows
-  const foldersToShow = new Set(state.navigationHistory);
-  const maxDepthInHistory = Math.max(...state.navigationHistory.map(id => FOLDER_GRAPH[id].depth));
+  // Build set of folders to always show: current folder + all in navigation history + all reachable folders
+  const foldersToShow = new Set();
 
-  // Add next 2 rows of folders from current position
-  Object.values(FOLDER_GRAPH).forEach(folder => {
-    if (folder.depth > depthIndex && folder.depth <= depthIndex + 2) {
-      foldersToShow.add(folder.id);
+  // Add all folders in navigation history
+  state.navigationHistory.forEach(id => foldersToShow.add(id));
+
+  // Find all reachable folders from navigation history (BFS traversal)
+  const queue = [...state.navigationHistory];
+  const visited = new Set(state.navigationHistory);
+
+  while (queue.length > 0) {
+    const currentId = queue.shift();
+    const currentFolder = FOLDER_GRAPH[currentId];
+
+    if (currentFolder && currentFolder.nodes) {
+      currentFolder.nodes.forEach(node => {
+        if (node.nextFolderId && !visited.has(node.nextFolderId)) {
+          visited.add(node.nextFolderId);
+          foldersToShow.add(node.nextFolderId);
+          queue.push(node.nextFolderId);
+        }
+      });
     }
-  });
+  }
 
-  // Show/hide platforms: current + history + next 2 rows
+  // Show/hide platforms
   platformMeshes.forEach((mesh, folderId) => {
     mesh.visible = foldersToShow.has(folderId);
   });
