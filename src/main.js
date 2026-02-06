@@ -597,7 +597,7 @@ function showCurrentFolder() {
   state.cameraMode = 'folder';
 
   // Set camera to look at this folder
-  setCameraToFolder(state.currentFolderId, false);
+  setCameraToFolder(state.currentFolderId, true);
 
   // Show/hide platforms: previous row + current + next 4 rows
   // This allows users to see at least 5 rows ahead
@@ -836,7 +836,7 @@ function setCameraToFolder(folderId, zoomIn = true) {
   state.targetLookAt.set(xPos, CONFIG.platform.height / 2, platformZ);
 
   // Use initialDistance only on first load, otherwise use maxDistance
-  const useInitial = state.isInitialLoad && zoomIn;
+  const useInitial = state.isInitialLoad;
   const baseDistance = useInitial ? CAMERA_CONFIG.folder.initialDistance : CAMERA_CONFIG.folder.maxDistance;
   const baseHeight = useInitial ? CAMERA_CONFIG.folder.initialHeight : CAMERA_CONFIG.folder.maxHeight;
   state.targetDistance = baseDistance;
