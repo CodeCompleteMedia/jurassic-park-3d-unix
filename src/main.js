@@ -142,7 +142,6 @@ async function init() {
 
   // Build initial platforms and nodes
   buildAllPlatforms();
-  showCurrentFolder();
 
   // Connection lines group
   connectionLines = new THREE.Group();
@@ -151,7 +150,19 @@ async function init() {
   // Draw permanent folder connections
   drawFolderConnections();
 
-  // Halo
+  // Initialize folder view
+  showCurrentFolder();
+
+  // Hide loading
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+  }, 1000);
+
+  // Animation loop
+  animate();
+}
+
+function setupLighting() {
   createHalo();
 
   // Event listeners
