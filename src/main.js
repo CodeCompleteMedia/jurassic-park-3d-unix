@@ -105,9 +105,6 @@ async function init() {
     CONFIG.camera.near,
     CONFIG.camera.far
   );
-  camera.position.copy(CONFIG.camera.defaultPos);
-  camera.lookAt(CONFIG.camera.lookAt);
-
   // Initialize camera state
   const folder = FOLDER_GRAPH[state.currentFolderId];
   const platformZ = CONFIG.depth.startZ - (folder.depth * CONFIG.depth.step);
@@ -117,6 +114,10 @@ async function init() {
   state.targetDistance = CAMERA_CONFIG.folder.initialDistance;
   state.currentHeight = CAMERA_CONFIG.folder.initialHeight;
   state.targetHeight = CAMERA_CONFIG.folder.initialHeight;
+
+  // Set camera position based on initial distance from folder
+  camera.position.set(0, state.currentHeight, platformZ + state.currentDistance);
+  camera.lookAt(state.currentLookAt);
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
